@@ -1,4 +1,4 @@
-:root {
+:root, :host {
   /****************** 
   Basics
   ******************/
@@ -10,6 +10,7 @@
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  font-family: Inter, sans-serif;
 
   /****************** 
   Colors variables
@@ -173,7 +174,7 @@
   }
 }
 
-:root {
+:root, :host {
   /************************************************** 
       Global colors 
   **************************************************/
@@ -208,7 +209,7 @@
 }
 
 /* Text colors */
-:root {
+:root, :host {
   --tt-color-text-gray: hsl(45, 2%, 46%);
   --tt-color-text-brown: hsl(19, 31%, 47%);
   --tt-color-text-orange: hsl(30, 89%, 45%);
@@ -253,7 +254,7 @@
 }
 
 /* Highlight colors */
-:root {
+:root, :host {
   --tt-color-highlight-yellow: #fef9c3;
   --tt-color-highlight-green: #dcfce7;
   --tt-color-highlight-blue: #e0f2fe;

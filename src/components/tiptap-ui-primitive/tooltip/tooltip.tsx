@@ -29,6 +29,7 @@ import {
   FloatingDelayGroup,
 } from "@floating-ui/react"
 import "@/components/tiptap-ui-primitive/tooltip/tooltip.scss"
+import { useShadowPortalContainer } from "@/components/tiptap-web-component/shadow-portal-context"
 
 interface TooltipProviderProps {
   children: React.ReactNode
@@ -211,6 +212,7 @@ export const TooltipContent = forwardRef<HTMLDivElement, TooltipContentProps>(
   ) {
     const context = useTooltipContext()
     const ref = useMergeRefs([context.refs.setFloating, propRef])
+    const portalContainer = useShadowPortalContainer()
 
     if (!context.open) return null
 
@@ -229,7 +231,14 @@ export const TooltipContent = forwardRef<HTMLDivElement, TooltipContentProps>(
     )
 
     if (portal) {
-      return <FloatingPortal {...portalProps}>{content}</FloatingPortal>
+      return (
+            <FloatingPortal
+                root={portalContainer ?? undefined}
+                {...portalProps}
+                >
+                    {content}
+                </FloatingPortal>
+            )
     }
 
     return content

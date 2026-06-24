@@ -10,4 +10,16 @@ export default defineConfig({
       '@': path.resolve(__dirname, './src')
     }
   },
+  define: {
+    'process.env.NODE_ENV': JSON.stringify('production'),
+  },
+  build: {
+     lib: {
+       entry: path.resolve(__dirname, 'src/tiptap-element.ts'),
+       name: 'TiptapElement',
+       fileName: 'tiptap-element',
+       formats: ['es'],
+     },
+     cssCodeSplit: false
+  }
 })

@@ -65,15 +65,17 @@ import { useWindowSize } from "@/hooks/use-window-size"
 import { useCursorVisibility } from "@/hooks/use-cursor-visibility"
 
 // --- Components ---
-import { ThemeToggle } from "@/components/tiptap-templates/simple/theme-toggle"
+import { ThemeToggle } from "@/components/tiptap-templates/simple/theme-toggle.tsx"
 
 // --- Lib ---
 import { handleImageUpload, MAX_FILE_SIZE } from "@/lib/tiptap-utils"
 
 // --- Styles ---
 import "@/components/tiptap-templates/simple/simple-editor.scss"
+import "@/styles/_keyframe-animations.scss"
+import "@/styles/_variables.scss"
 
-import content from "@/components/tiptap-templates/simple/data/content.json"
+//import content from "@/components/tiptap-templates/simple/data/content.json"
 
 const MainToolbarContent = ({
   onHighlighterClick,
@@ -183,7 +185,14 @@ const MobileToolbarContent = ({
   </>
 )
 
-export function SimpleEditor() {
+import type { Content } from "@tiptap/react"
+
+export interface SimpleEditorProps {
+    content?: Content
+    onContentChange?: (html: string) => void
+}
+
+export function SimpleEditor({ content, onContentChange }: SimpleEditorProps) {
   const isMobile = useIsBreakpoint()
   const { height } = useWindowSize()
   const [mobileView, setMobileView] = useState<"main" | "highlighter" | "link">(
@@ -228,13 +237,27 @@ export function SimpleEditor() {
         onError: (error) => console.error("Upload failed:", error),
       }),
     ],
-    content,
+    content: content ?? "<p></p>",
+    onUpdate: ({ editor }) => {
+        onContentChange?.(editor.getHTML())
+    },
   })
 
   const rect = useCursorVisibility({
     editor,
     overlayHeight: toolbarRef.current?.getBoundingClientRect().height ?? 0,
   })
+
+    useEffect(() => {
+        if (editor && content !== undefined) {
+            const current = editor.getHTML()
+            // avoid feedback loop / cursor jump if content matches what's already there
+            if (current !== content) {
+                editor.commands.setContent(content, { emitUpdate: false })
+            }
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [content, editor])
 
   useEffect(() => {
     if (!isMobile && mobileView !== "main") {

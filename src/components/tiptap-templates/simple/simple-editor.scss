@@ -1,6 +1,6 @@
 @import url("https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap");
 
-body {
+body, .simple-editor-content {
   --tt-toolbar-height: 44px;
   --tt-theme-text: var(--tt-gray-light-900);
 
@@ -9,7 +9,7 @@ body {
   }
 }
 
-body {
+body, :host, .simple-editor-content {
   font-family: "Inter", sans-serif;
   color: var(--tt-theme-text);
   font-optical-sizing: auto;
@@ -17,17 +17,19 @@ body {
   font-style: normal;
   padding: 0;
   overscroll-behavior-y: none;
+  height: inherit;
+  width: inherit;
 }
 
 html,
-body {
+body, :host, .simple-editor-content {
   overscroll-behavior-x: none;
 }
 
 html,
 body,
 #root,
-#app {
+#app, :host, .simple-editor-content {
   height: 100%;
   background-color: var(--tt-bg-color);
 }
@@ -55,17 +57,17 @@ body,
 }
 
 .simple-editor-wrapper {
-  width: 100vw;
-  height: 100vh;
+  width: inherit;
+  height: inherit;
   overflow: auto;
 }
 
 .simple-editor-content {
-  max-width: 648px;
+  /*max-width: 648px;*/
   width: 100%;
   margin: 0 auto;
   height: 100%;
-  display: flex;
+  display: table;
   flex-direction: column;
   flex: 1;
 }
@@ -79,4 +81,34 @@ body,
   .simple-editor-content .tiptap.ProseMirror.simple-editor {
     padding: 1rem 1.5rem 30vh;
   }
+}
+
+:host {
+  display: block;
+  height: 100%;
+}
+
+.simple-editor-wrapper {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.simple-editor-content {
+  flex: 1 1 auto;
+  overflow-y: auto;
+}
+
+.simple-editor-wrapper {
+  height: 100%;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.simple-editor-content .tiptap.ProseMirror.simple-editor {
+  height: 100%;
+  padding: 0;
+  overflow: auto;
 }

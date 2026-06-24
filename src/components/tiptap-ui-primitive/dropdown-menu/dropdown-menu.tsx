@@ -1,7 +1,7 @@
 import * as DropdownMenuPrimitive from "@radix-ui/react-dropdown-menu"
 import { cn } from "@/lib/tiptap-utils"
 import { CheckIcon } from "@/components/tiptap-icons/check-icon"
-
+import { useShadowPortalContainer } from "@/components/tiptap-web-component/shadow-portal-context"
 import "@/components/tiptap-ui-primitive/dropdown-menu/dropdown-menu.scss"
 
 function DropdownMenu({
@@ -40,8 +40,9 @@ function DropdownMenuContent({
   sideOffset = 4,
   ...props
 }: React.ComponentProps<typeof DropdownMenuPrimitive.Content>) {
+  const portalContainer = useShadowPortalContainer()
   return (
-    <DropdownMenuPrimitive.Portal>
+    <DropdownMenuPrimitive.Portal container={portalContainer ?? undefined}>
       <DropdownMenuPrimitive.Content
         data-slot="tiptap-dropdown-menu-content"
         sideOffset={sideOffset}

@@ -1,5 +1,6 @@
 import * as PopoverPrimitive from "@radix-ui/react-popover"
 import { cn } from "@/lib/tiptap-utils"
+import { useShadowPortalContainer } from "@/components/tiptap-web-component/shadow-portal-context"
 import "@/components/tiptap-ui-primitive/popover/popover.scss"
 
 function Popover({
@@ -20,8 +21,9 @@ function PopoverContent({
   sideOffset = 4,
   ...props
 }: React.ComponentProps<typeof PopoverPrimitive.Content>) {
+  const portalContainer = useShadowPortalContainer()
   return (
-    <PopoverPrimitive.Portal>
+    <PopoverPrimitive.Portal container={portalContainer ?? undefined}>
       <PopoverPrimitive.Content
         align={align}
         sideOffset={sideOffset}
