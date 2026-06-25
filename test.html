@@ -1,0 +1,17 @@
+<script type="module" src="dist/tiptap-element.js"></script>
+<!--<link rel="stylesheet" href="dist/tiptap-element.css" />-->
+<tiptap-editor style="height: 300px; display: block;" content="<p>Hello world</p>"></tiptap-editor>
+<!--<tiptap-editor style="height: 300px; display: block;" content="<p>Hello world1</p>"></tiptap-editor>-->
+
+<style>
+    body {margin: 0}
+</style>
+<script>
+  const el = document.querySelector('tiptap-editor')
+  el.addEventListener('content-change', (e) => {
+    console.log('Updated HTML:', e.detail)
+  })
+
+  // To set content programmatically later, update the attribute:
+  el.setAttribute('content', '<p>New content</p>')
+</script>
