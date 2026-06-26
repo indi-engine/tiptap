@@ -1,6 +1,13 @@
 "use client"
 
-import { useEffect, useRef, useState } from "react"
+import {
+  Fragment,
+  type ReactNode,
+  type RefObject,
+  useEffect,
+  useRef,
+  useState,
+} from "react"
 import { EditorContent, EditorContext, useEditor } from "@tiptap/react"
 
 // --- Tiptap Core Extensions ---
@@ -63,6 +70,12 @@ import { LinkIcon } from "@/components/tiptap-icons/link-icon"
 import { useIsBreakpoint } from "@/hooks/use-is-breakpoint"
 import { useWindowSize } from "@/hooks/use-window-size"
 import { useCursorVisibility } from "@/hooks/use-cursor-visibility"
+import { useRefRect } from "@/hooks/use-element-rect"
+import {
+  TOOLBAR_PRESETS,
+  type ToolbarConfig,
+  type ToolbarItemId,
+} from "@/components/tiptap-templates/simple/simple-editor-toolbar"
 
 // --- Components ---
 import { ThemeToggle } from "@/components/tiptap-templates/simple/theme-toggle.tsx"
@@ -77,81 +90,119 @@ import "@/styles/_variables.scss"
 
 //import content from "@/components/tiptap-templates/simple/data/content.json"
 
-const MainToolbarContent = ({
-  onHighlighterClick,
-  onLinkClick,
-  isMobile,
-}: {
+type ToolbarRenderContext = {
   onHighlighterClick: () => void
   onLinkClick: () => void
   isMobile: boolean
-}) => {
-  return (
-    <>
-      <Spacer />
+}
 
-      <ToolbarGroup>
-        <UndoRedoButton action="undo" />
-        <UndoRedoButton action="redo" />
-      </ToolbarGroup>
-
-      <ToolbarSeparator />
-
-      <ToolbarGroup>
-        <HeadingDropdownMenu modal={false} levels={[1, 2, 3, 4]} />
+function renderToolbarItem(
+  item: ToolbarItemId,
+  { onHighlighterClick, onLinkClick, isMobile }: ToolbarRenderContext
+): ReactNode {
+  switch (item) {
+    case "undo":
+      return <UndoRedoButton action="undo" />
+    case "redo":
+      return <UndoRedoButton action="redo" />
+    case "heading":
+      return <HeadingDropdownMenu modal={false} levels={[1, 2, 3, 4]} />
+    case "list":
+      return (
         <ListDropdownMenu
           modal={false}
           types={["bulletList", "orderedList", "taskList"]}
         />
-        <BlockquoteButton />
-        <CodeBlockButton />
-      </ToolbarGroup>
+      )
+    case "blockquote":
+      return <BlockquoteButton />
+    case "code-block":
+      return <CodeBlockButton />
+    case "bold":
+      return <MarkButton type="bold" />
+    case "italic":
+      return <MarkButton type="italic" />
+    case "strike":
+      return <MarkButton type="strike" />
+    case "code":
+      return <MarkButton type="code" />
+    case "underline":
+      return <MarkButton type="underline" />
+    case "highlight":
+      return isMobile ? (
+        <ColorHighlightPopoverButton onClick={onHighlighterClick} />
+      ) : (
+        <ColorHighlightPopover />
+      )
+    case "link":
+      return isMobile ? <LinkButton onClick={onLinkClick} /> : <LinkPopover />
+    case "superscript":
+      return <MarkButton type="superscript" />
+    case "subscript":
+      return <MarkButton type="subscript" />
+    case "align-left":
+      return <TextAlignButton align="left" />
+    case "align-center":
+      return <TextAlignButton align="center" />
+    case "align-right":
+      return <TextAlignButton align="right" />
+    case "align-justify":
+      return <TextAlignButton align="justify" />
+    case "image":
+      return <ImageUploadButton text="Add" />
+    case "theme":
+      return <ThemeToggle />
+  }
+}
 
-      <ToolbarSeparator />
+const MainToolbarContent = ({
+  onHighlighterClick,
+  onLinkClick,
+  isMobile,
+  toolbar,
+}: {
+  onHighlighterClick: () => void
+  onLinkClick: () => void
+  isMobile: boolean
+  toolbar: ToolbarConfig
+}) => {
+  const renderContext = { onHighlighterClick, onLinkClick, isMobile }
+  const groups = toolbar.groups
+    .map((group) =>
+      group
+        .filter((item) => item !== "theme")
+        .map((item) => renderToolbarItem(item, renderContext))
+        .filter((item) => item !== null)
+    )
+    .filter((group) => group.length > 0)
+  const themeGroup = toolbar.groups.some((group) => group.includes("theme"))
 
-      <ToolbarGroup>
-        <MarkButton type="bold" />
-        <MarkButton type="italic" />
-        <MarkButton type="strike" />
-        <MarkButton type="code" />
-        <MarkButton type="underline" />
-        {!isMobile ? (
-          <ColorHighlightPopover />
-        ) : (
-          <ColorHighlightPopoverButton onClick={onHighlighterClick} />
-        )}
-        {!isMobile ? <LinkPopover /> : <LinkButton onClick={onLinkClick} />}
-      </ToolbarGroup>
+  return (
+    <>
+      <Spacer />
 
-      <ToolbarSeparator />
-
-      <ToolbarGroup>
-        <MarkButton type="superscript" />
-        <MarkButton type="subscript" />
-      </ToolbarGroup>
-
-      <ToolbarSeparator />
-
-      <ToolbarGroup>
-        <TextAlignButton align="left" />
-        <TextAlignButton align="center" />
-        <TextAlignButton align="right" />
-        <TextAlignButton align="justify" />
-      </ToolbarGroup>
-
-      <ToolbarSeparator />
-
-      <ToolbarGroup>
-        <ImageUploadButton text="Add" />
-      </ToolbarGroup>
+      {groups.map((group, index) => (
+        <Fragment key={index}>
+          {index > 0 && <ToolbarSeparator />}
+          <ToolbarGroup>
+            {group.map((item, itemIndex) => (
+              <Fragment key={itemIndex}>{item}</Fragment>
+            ))}
+          </ToolbarGroup>
+        </Fragment>
+      ))}
 
       <Spacer />
 
-      {isMobile && <ToolbarSeparator />}
+      {themeGroup && (
+        <>
+          {isMobile && <ToolbarSeparator />}
 
-      <ToolbarGroup>
-        <ThemeToggle />
-      </ToolbarGroup>
+          <ToolbarGroup>
+            <ThemeToggle />
+          </ToolbarGroup>
+        </>
+      )}
     </>
   )
 }
@@ -191,15 +242,27 @@ export interface SimpleEditorProps {
   content?: Content
   onContentChange?: (html: string) => void
   isReadOnly?: boolean
+  toolbar?: ToolbarConfig
 }
 
-export function SimpleEditor({ content, onContentChange, isReadOnly = false }: SimpleEditorProps) {
+export function SimpleEditor({
+  content,
+  onContentChange,
+  isReadOnly = false,
+  toolbar = TOOLBAR_PRESETS.full,
+}: SimpleEditorProps) {
   const isMobile = useIsBreakpoint()
   const { height } = useWindowSize()
   const [mobileView, setMobileView] = useState<"main" | "highlighter" | "link">(
     "main"
   )
   const toolbarRef = useRef<HTMLDivElement>(null)
+  const hasToolbar = toolbar.groups.length > 0
+  const toolbarRect = useRefRect(toolbarRef as RefObject<HTMLDivElement>, {
+    enabled: hasToolbar,
+    throttleMs: 100,
+    useResizeObserver: true,
+  })
 
   const editor = useEditor({
     immediatelyRender: false,
@@ -247,7 +310,7 @@ export function SimpleEditor({ content, onContentChange, isReadOnly = false }: S
 
   const rect = useCursorVisibility({
     editor,
-    overlayHeight: toolbarRef.current?.getBoundingClientRect().height ?? 0,
+    overlayHeight: toolbarRect.height,
   })
 
   useEffect(() => {
@@ -258,45 +321,43 @@ export function SimpleEditor({ content, onContentChange, isReadOnly = false }: S
         editor.commands.setContent(content, { emitUpdate: false })
       }
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [content, editor])
-
-  useEffect(() => {
-    if (!isMobile && mobileView !== "main") {
-      setMobileView("main")
-    }
-  }, [isMobile, mobileView])
 
   useEffect(() => {
     editor?.setEditable(!isReadOnly)
   }, [editor, isReadOnly])
 
+  const activeMobileView = isMobile ? mobileView : "main"
+
   return (
     <div className="simple-editor-wrapper">
       <EditorContext.Provider value={{ editor }}>
-        <Toolbar
-          ref={toolbarRef}
-          style={{
-            ...(isMobile
-              ? {
-                bottom: `calc(100% - ${height - rect.y}px)`,
-              }
-              : {}),
-          }}
-        >
-          {mobileView === "main" ? (
-            <MainToolbarContent
-              onHighlighterClick={() => setMobileView("highlighter")}
-              onLinkClick={() => setMobileView("link")}
-              isMobile={isMobile}
-            />
-          ) : (
-            <MobileToolbarContent
-              type={mobileView === "highlighter" ? "highlighter" : "link"}
-              onBack={() => setMobileView("main")}
-            />
-          )}
-        </Toolbar>
+        {hasToolbar && (
+          <Toolbar
+            ref={toolbarRef}
+            style={{
+              ...(isMobile
+                ? {
+                  bottom: `calc(100% - ${height - rect.y}px)`,
+                }
+                : {}),
+            }}
+          >
+            {activeMobileView === "main" ? (
+              <MainToolbarContent
+                onHighlighterClick={() => setMobileView("highlighter")}
+                onLinkClick={() => setMobileView("link")}
+                isMobile={isMobile}
+                toolbar={toolbar}
+              />
+            ) : (
+              <MobileToolbarContent
+                type={activeMobileView === "highlighter" ? "highlighter" : "link"}
+                onBack={() => setMobileView("main")}
+              />
+            )}
+          </Toolbar>
+        )}
 
         <EditorContent
           editor={editor}

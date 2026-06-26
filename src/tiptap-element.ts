@@ -6,6 +6,8 @@ import { TiptapWCAdapter } from '@/components/tiptap-web-component/tiptap-wc-ada
 const TiptapElement = r2wc(TiptapWCAdapter, {
     props: {
         content: 'string',
+        toolbar: 'string',
+        toolbarItems: 'string',
     },
     shadow: 'open', // strongly recommended — see CSS note below
 })
