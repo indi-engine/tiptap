@@ -188,11 +188,12 @@ const MobileToolbarContent = ({
 import type { Content } from "@tiptap/react"
 
 export interface SimpleEditorProps {
-    content?: Content
-    onContentChange?: (html: string) => void
+  content?: Content
+  onContentChange?: (html: string) => void
+  isReadOnly?: boolean
 }
 
-export function SimpleEditor({ content, onContentChange }: SimpleEditorProps) {
+export function SimpleEditor({ content, onContentChange, isReadOnly = false }: SimpleEditorProps) {
   const isMobile = useIsBreakpoint()
   const { height } = useWindowSize()
   const [mobileView, setMobileView] = useState<"main" | "highlighter" | "link">(
@@ -202,6 +203,7 @@ export function SimpleEditor({ content, onContentChange }: SimpleEditorProps) {
 
   const editor = useEditor({
     immediatelyRender: false,
+    editable: !isReadOnly,
     editorProps: {
       attributes: {
         autocomplete: "off",
@@ -239,7 +241,7 @@ export function SimpleEditor({ content, onContentChange }: SimpleEditorProps) {
     ],
     content: content ?? "<p></p>",
     onUpdate: ({ editor }) => {
-        onContentChange?.(editor.getHTML())
+      onContentChange?.(editor.getHTML())
     },
   })
 
@@ -248,22 +250,26 @@ export function SimpleEditor({ content, onContentChange }: SimpleEditorProps) {
     overlayHeight: toolbarRef.current?.getBoundingClientRect().height ?? 0,
   })
 
-    useEffect(() => {
-        if (editor && content !== undefined) {
-            const current = editor.getHTML()
-            // avoid feedback loop / cursor jump if content matches what's already there
-            if (current !== content) {
-                editor.commands.setContent(content, { emitUpdate: false })
-            }
-        }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [content, editor])
+  useEffect(() => {
+    if (editor && content !== undefined) {
+      const current = editor.getHTML()
+      // avoid feedback loop / cursor jump if content matches what's already there
+      if (current !== content) {
+        editor.commands.setContent(content, { emitUpdate: false })
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [content, editor])
 
   useEffect(() => {
     if (!isMobile && mobileView !== "main") {
       setMobileView("main")
     }
   }, [isMobile, mobileView])
+
+  useEffect(() => {
+    editor?.setEditable(!isReadOnly)
+  }, [editor, isReadOnly])
 
   return (
     <div className="simple-editor-wrapper">
@@ -273,8 +279,8 @@ export function SimpleEditor({ content, onContentChange }: SimpleEditorProps) {
           style={{
             ...(isMobile
               ? {
-                  bottom: `calc(100% - ${height - rect.y}px)`,
-                }
+                bottom: `calc(100% - ${height - rect.y}px)`,
+              }
               : {}),
           }}
         >
