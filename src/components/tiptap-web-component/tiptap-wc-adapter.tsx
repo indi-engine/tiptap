@@ -16,6 +16,7 @@ interface TiptapWCProps {
 }
 
 const TOOLBAR_ITEM_ID_SET = new Set<string>(TOOLBAR_ITEM_IDS)
+const TIPTAP_ELEMENT_CSS = "__TIPTAP_ELEMENT_CSS_PLACEHOLDER__"
 
 function getCustomElementHost(container: HTMLElement | null): HTMLElement | null {
     const root = container?.getRootNode()
@@ -64,7 +65,6 @@ function resolveToolbar(host: HTMLElement): ToolbarConfig {
 
 export function TiptapWCAdapter({ content }: TiptapWCProps) {
     const hostRef = useRef<HTMLDivElement>(null)
-    const [cssText, setCssText] = useState<string>("")
     const [portalContainer, setPortalContainer] = useState<HTMLElement | null>(null)
     const [isReadOnly, setIsReadOnly] = useState(false)
     const [toolbarConfig, setToolbarConfig] = useState<ToolbarConfig>(TOOLBAR_PRESETS.full)
@@ -90,18 +90,6 @@ export function TiptapWCAdapter({ content }: TiptapWCProps) {
     }, [])
 
     useEffect(() => {
-        const cssUrl = new URL("./tiptap-element.css", import.meta.url).href
-        fetch(cssUrl, {
-            headers: {
-                "Accept": "text/css"
-            }
-        })
-            .then((res) => res.text())
-            .then(setCssText)
-            .catch((err) => console.error("Failed to load Tiptap styles:", err))
-    }, [])
-
-    useEffect(() => {
         // Once mounted, hostRef.current lives inside the shadow root.
         // Use it directly as the Radix portal target so dropdowns/popovers
         // render inside the shadow boundary instead of document.body.
@@ -121,7 +109,7 @@ export function TiptapWCAdapter({ content }: TiptapWCProps) {
     }
     return (
         <div ref={hostRef}>
-            {cssText && <style>{cssText}</style>}
+            <style>{TIPTAP_ELEMENT_CSS}</style>
             <ShadowPortalContext.Provider value={portalContainer}>
                 <SimpleEditor
                     content={content}
