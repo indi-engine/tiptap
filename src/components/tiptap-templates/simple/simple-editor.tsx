@@ -9,6 +9,8 @@ import {
   useState,
 } from "react"
 import { EditorContent, EditorContext, useEditor } from "@tiptap/react"
+import type { Editor } from "@tiptap/react"
+import { DOMSerializer } from "@tiptap/pm/model"
 
 // --- Tiptap Core Extensions ---
 import { StarterKit } from "@tiptap/starter-kit"
@@ -99,6 +101,25 @@ import "@/styles/_keyframe-animations.scss"
 import "@/styles/_variables.scss"
 
 //import content from "@/components/tiptap-templates/simple/data/content.json"
+
+function serializeSingleParagraphContent(editor: Editor): string | null {
+  const { doc } = editor.state
+  if (doc.childCount !== 1) return null
+
+  const onlyNode = doc.child(0)
+  if (onlyNode.type.name !== "paragraph") return null
+
+  const serializer = DOMSerializer.fromSchema(editor.schema)
+  const fragment = serializer.serializeFragment(onlyNode.content)
+  const container = document.createElement("div")
+  container.appendChild(fragment)
+
+  return container.innerHTML
+}
+
+function getPublicEditorValue(editor: Editor): string {
+  return serializeSingleParagraphContent(editor) ?? editor.getHTML()
+}
 
 type ToolbarRenderContext = {
   onHighlighterClick: () => void
@@ -361,7 +382,7 @@ export function SimpleEditor({
     ],
     content: content ?? "<p></p>",
     onUpdate: ({ editor }) => {
-      onContentChange?.(editor.getHTML())
+      onContentChange?.(getPublicEditorValue(editor))
     },
   })
 

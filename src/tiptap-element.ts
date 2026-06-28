@@ -4,7 +4,6 @@ import { TiptapWCAdapter } from '@/components/tiptap-web-component/tiptap-wc-ada
 
 const ReactTiptapElement = r2wc(TiptapWCAdapter, {
     props: {
-        content: 'string',
         value: 'string',
         toolbar: 'string',
         toolbarItems: 'string',
@@ -20,7 +19,7 @@ class TiptapElement extends ReactTiptapElement {
         const baseAttributes =
             (ReactTiptapElement as CustomElementConstructor & { observedAttributes?: string[] })
                 .observedAttributes ?? []
-        return Array.from(new Set([...baseAttributes, 'value', 'content']))
+        return Array.from(new Set([...baseAttributes, 'value']))
     }
 
     connectedCallback() {
@@ -43,7 +42,7 @@ class TiptapElement extends ReactTiptapElement {
 
         if (oldValue === newValue) return
 
-        if (name === 'value' || name === 'content') {
+        if (name === 'value') {
             this.value = newValue ?? ''
         }
     }
@@ -69,18 +68,9 @@ class TiptapElement extends ReactTiptapElement {
         const nextValue = String(value ?? '')
         this._value = nextValue
 
-        // Internal bridge to the React adapter. Consumers should use `.value`.
-        if (this.getAttribute('content') !== nextValue) {
-            this.setAttribute('content', nextValue)
+        if (this.getAttribute('value') !== nextValue) {
+            this.setAttribute('value', nextValue)
         }
-    }
-
-    get content() {
-        return this.value
-    }
-
-    set content(value: string) {
-        this.value = value
     }
 
     setValueFromEditor(value: string) {
@@ -92,8 +82,8 @@ class TiptapElement extends ReactTiptapElement {
 
         const initialValue =
             this.getAttribute('value') ??
-            this.getAttribute('content') ??
-            this.innerHTML.trim()
+            this.textContent ??
+            ''
 
         if (this._defaultValue === undefined) {
             this._defaultValue = initialValue
@@ -103,8 +93,8 @@ class TiptapElement extends ReactTiptapElement {
             this._value = this._defaultValue
         }
 
-        if (this.getAttribute('content') !== this._value) {
-            this.setAttribute('content', this._value)
+        if (this.getAttribute('value') !== this._value) {
+            this.setAttribute('value', this._value)
         }
     }
 }

@@ -110,7 +110,7 @@ body,
   overflow: hidden;
 }
 .simple-editor-content .tiptap.ProseMirror.simple-editor {
-  height: 100%;
+  height: fit-content;
   padding: 0;
   overflow: auto;
 }

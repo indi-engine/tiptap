@@ -10,7 +10,6 @@ import {
 import { ShadowPortalContext } from "@/components/tiptap-web-component/shadow-portal-context"
 
 interface TiptapWCProps {
-    content?: string
     value?: string
     toolbar?: string
     toolbarItems?: string
@@ -64,7 +63,7 @@ function resolveToolbar(host: HTMLElement): ToolbarConfig {
     return TOOLBAR_PRESETS.full
 }
 
-export function TiptapWCAdapter({ content, value }: TiptapWCProps) {
+export function TiptapWCAdapter({ value }: TiptapWCProps) {
     const hostRef = useRef<HTMLDivElement>(null)
     const [portalContainer, setPortalContainer] = useState<HTMLElement | null>(null)
     const [isReadOnly, setIsReadOnly] = useState(false)
@@ -122,7 +121,7 @@ export function TiptapWCAdapter({ content, value }: TiptapWCProps) {
             <style>{TIPTAP_ELEMENT_CSS}</style>
             <ShadowPortalContext.Provider value={portalContainer}>
                 <SimpleEditor
-                    content={content ?? value}
+                    content={value}
                     onContentChange={handleContentChange}
                     isReadOnly={isReadOnly}
                     toolbar={toolbarConfig}
