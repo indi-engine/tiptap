@@ -13,6 +13,7 @@ interface TiptapWCProps {
     value?: string
     toolbar?: string
     toolbarItems?: string
+    disabled?: boolean
 }
 
 const TOOLBAR_ITEM_ID_SET = new Set<string>(TOOLBAR_ITEM_IDS)
@@ -67,6 +68,7 @@ export function TiptapWCAdapter({ value }: TiptapWCProps) {
     const hostRef = useRef<HTMLDivElement>(null)
     const [portalContainer, setPortalContainer] = useState<HTMLElement | null>(null)
     const [isReadOnly, setIsReadOnly] = useState(false)
+    const [isDisabled, setIsDisabled] = useState(false)
     const [toolbarConfig, setToolbarConfig] = useState<ToolbarConfig>(TOOLBAR_PRESETS.full)
 
     // r2wc does not re-render when a string attribute is removed (value becomes null).
@@ -77,6 +79,7 @@ export function TiptapWCAdapter({ value }: TiptapWCProps) {
 
         const syncHostAttributes = () => {
             setIsReadOnly(host.hasAttribute("readonly"))
+            setIsDisabled(host.hasAttribute("disabled"))
             setToolbarConfig(resolveToolbar(host))
         }
         syncHostAttributes()
@@ -84,7 +87,7 @@ export function TiptapWCAdapter({ value }: TiptapWCProps) {
         const observer = new MutationObserver(syncHostAttributes)
         observer.observe(host, {
             attributes: true,
-            attributeFilter: ["readonly", "toolbar", "toolbar-items"],
+            attributeFilter: ["readonly", "disabled", "toolbar", "toolbar-items"],
         })
         return () => observer.disconnect()
     }, [])
@@ -99,6 +102,8 @@ export function TiptapWCAdapter({ value }: TiptapWCProps) {
     const handleContentChange = (html: string) => {
         const root = hostRef.current?.getRootNode() as ShadowRoot | Document
         const host = (root as ShadowRoot)?.host ?? hostRef.current
+        if (host instanceof HTMLElement && host.hasAttribute("disabled")) return
+
         if (host && "setValueFromEditor" in host) {
             ;(host as HTMLElement & { setValueFromEditor: (value: string) => void }).setValueFromEditor(html)
         }
@@ -124,6 +129,7 @@ export function TiptapWCAdapter({ value }: TiptapWCProps) {
                     content={value}
                     onContentChange={handleContentChange}
                     isReadOnly={isReadOnly}
+                    isDisabled={isDisabled}
                     toolbar={toolbarConfig}
                 />
             </ShadowPortalContext.Provider>

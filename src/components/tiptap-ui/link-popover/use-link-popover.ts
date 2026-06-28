@@ -80,7 +80,7 @@ export function shouldShowLinkButton(props: {
 }): boolean {
   const { editor, hideWhenUnavailable } = props
 
-  if (!editor || !editor.isEditable) return false
+  if (!editor) return false
 
   const linkInSchema = isMarkInSchema("link", editor)
 
@@ -88,6 +88,8 @@ export function shouldShowLinkButton(props: {
   if (!hideWhenUnavailable) {
     return true
   }
+
+  if (!editor.isEditable) return false
 
   // hideWhenUnavailable is true: hide if link is not in schema
   if (!linkInSchema) {

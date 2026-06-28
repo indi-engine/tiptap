@@ -318,6 +318,7 @@ export interface SimpleEditorProps {
   content?: Content
   onContentChange?: (html: string) => void
   isReadOnly?: boolean
+  isDisabled?: boolean
   toolbar?: ToolbarConfig
 }
 
@@ -325,6 +326,7 @@ export function SimpleEditor({
   content,
   onContentChange,
   isReadOnly = false,
+  isDisabled = false,
   toolbar = TOOLBAR_PRESETS.full,
 }: SimpleEditorProps) {
   const isMobile = useIsBreakpoint()
@@ -339,16 +341,18 @@ export function SimpleEditor({
     throttleMs: 100,
     useResizeObserver: true,
   })
+  const isEditable = !isReadOnly && !isDisabled
 
   const editor = useEditor({
     immediatelyRender: false,
-    editable: !isReadOnly,
+    editable: isEditable,
     editorProps: {
       attributes: {
         autocomplete: "off",
         autocorrect: "off",
         autocapitalize: "off",
         "aria-label": "Main content area, start typing to enter text.",
+        "aria-disabled": String(isDisabled),
         class: "simple-editor",
       },
     },
@@ -402,13 +406,13 @@ export function SimpleEditor({
   }, [content, editor])
 
   useEffect(() => {
-    editor?.setEditable(!isReadOnly)
-  }, [editor, isReadOnly])
+    editor?.setEditable(isEditable)
+  }, [editor, isEditable])
 
   const activeMobileView = isMobile ? mobileView : "main"
 
   return (
-    <div className="simple-editor-wrapper">
+    <div className="simple-editor-wrapper" data-disabled={isDisabled || undefined}>
       <EditorContext.Provider value={{ editor }}>
         {hasToolbar && (
           <Toolbar

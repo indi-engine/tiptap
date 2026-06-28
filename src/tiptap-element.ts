@@ -7,6 +7,7 @@ const ReactTiptapElement = r2wc(TiptapWCAdapter, {
         value: 'string',
         toolbar: 'string',
         toolbarItems: 'string',
+        disabled: 'boolean',
     },
     shadow: 'open',
 })
@@ -19,7 +20,7 @@ class TiptapElement extends ReactTiptapElement {
         const baseAttributes =
             (ReactTiptapElement as CustomElementConstructor & { observedAttributes?: string[] })
                 .observedAttributes ?? []
-        return Array.from(new Set([...baseAttributes, 'value']))
+        return Array.from(new Set([...baseAttributes, 'value', 'disabled']))
     }
 
     connectedCallback() {
@@ -70,6 +71,18 @@ class TiptapElement extends ReactTiptapElement {
 
         if (this.getAttribute('value') !== nextValue) {
             this.setAttribute('value', nextValue)
+        }
+    }
+
+    get disabled() {
+        return this.hasAttribute('disabled')
+    }
+
+    set disabled(value: boolean) {
+        if (value) {
+            this.setAttribute('disabled', '')
+        } else {
+            this.removeAttribute('disabled')
         }
     }
 
