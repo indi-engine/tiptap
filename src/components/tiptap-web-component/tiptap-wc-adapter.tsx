@@ -11,6 +11,7 @@ import { ShadowPortalContext } from "@/components/tiptap-web-component/shadow-po
 
 interface TiptapWCProps {
     content?: string
+    value?: string
     toolbar?: string
     toolbarItems?: string
 }
@@ -63,7 +64,7 @@ function resolveToolbar(host: HTMLElement): ToolbarConfig {
     return TOOLBAR_PRESETS.full
 }
 
-export function TiptapWCAdapter({ content }: TiptapWCProps) {
+export function TiptapWCAdapter({ content, value }: TiptapWCProps) {
     const hostRef = useRef<HTMLDivElement>(null)
     const [portalContainer, setPortalContainer] = useState<HTMLElement | null>(null)
     const [isReadOnly, setIsReadOnly] = useState(false)
@@ -99,6 +100,15 @@ export function TiptapWCAdapter({ content }: TiptapWCProps) {
     const handleContentChange = (html: string) => {
         const root = hostRef.current?.getRootNode() as ShadowRoot | Document
         const host = (root as ShadowRoot)?.host ?? hostRef.current
+        if (host && "setValueFromEditor" in host) {
+            ;(host as HTMLElement & { setValueFromEditor: (value: string) => void }).setValueFromEditor(html)
+        }
+        host?.dispatchEvent(
+            new Event("input", {
+                bubbles: true,
+                composed: true,
+            })
+        )
         host?.dispatchEvent(
             new CustomEvent("content-change", {
                 detail: html,
@@ -112,7 +122,7 @@ export function TiptapWCAdapter({ content }: TiptapWCProps) {
             <style>{TIPTAP_ELEMENT_CSS}</style>
             <ShadowPortalContext.Provider value={portalContainer}>
                 <SimpleEditor
-                    content={content}
+                    content={content ?? value}
                     onContentChange={handleContentChange}
                     isReadOnly={isReadOnly}
                     toolbar={toolbarConfig}
