@@ -23,7 +23,7 @@ import { Color } from "@tiptap/extension-color"
 import { Subscript } from "@tiptap/extension-subscript"
 import { Superscript } from "@tiptap/extension-superscript"
 import { TextStyle } from "@tiptap/extension-text-style"
-import { Selection } from "@tiptap/extensions"
+import { Placeholder, Selection } from "@tiptap/extensions"
 
 // --- UI Primitives ---
 import { Button } from "@/components/tiptap-ui-primitive/button"
@@ -319,6 +319,7 @@ export interface SimpleEditorProps {
   onContentChange?: (html: string) => void
   isReadOnly?: boolean
   isDisabled?: boolean
+  placeholder?: string
   toolbar?: ToolbarConfig
 }
 
@@ -327,6 +328,7 @@ export function SimpleEditor({
   onContentChange,
   isReadOnly = false,
   isDisabled = false,
+  placeholder,
   toolbar = TOOLBAR_PRESETS.full,
 }: SimpleEditorProps) {
   const isMobile = useIsBreakpoint()
@@ -335,6 +337,8 @@ export function SimpleEditor({
     "main" | "highlighter" | "text-color" | "link"
   >("main")
   const toolbarRef = useRef<HTMLDivElement>(null)
+  const placeholderRef = useRef(placeholder ?? "")
+  placeholderRef.current = placeholder ?? ""
   const hasToolbar = toolbar.groups.length > 0
   const toolbarRect = useRefRect(toolbarRef as RefObject<HTMLDivElement>, {
     enabled: hasToolbar,
@@ -371,6 +375,10 @@ export function SimpleEditor({
       Highlight.configure({ multicolor: true }),
       TextStyle,
       Color,
+      Placeholder.configure({
+        placeholder: () => placeholderRef.current,
+        showOnlyWhenEditable: false,
+      }),
       Image,
       Typography,
       Superscript,
@@ -408,6 +416,12 @@ export function SimpleEditor({
   useEffect(() => {
     editor?.setEditable(isEditable)
   }, [editor, isEditable])
+
+  useEffect(() => {
+    if (!editor) return
+
+    editor.view.dispatch(editor.state.tr)
+  }, [editor, placeholder])
 
   const activeMobileView = isMobile ? mobileView : "main"
 

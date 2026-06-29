@@ -13,6 +13,7 @@ interface TiptapWCProps {
     value?: string
     toolbar?: string
     toolbarItems?: string
+    placeholder?: string
     disabled?: boolean
 }
 
@@ -69,6 +70,7 @@ export function TiptapWCAdapter({ value }: TiptapWCProps) {
     const [portalContainer, setPortalContainer] = useState<HTMLElement | null>(null)
     const [isReadOnly, setIsReadOnly] = useState(false)
     const [isDisabled, setIsDisabled] = useState(false)
+    const [placeholder, setPlaceholder] = useState<string | undefined>()
     const [toolbarConfig, setToolbarConfig] = useState<ToolbarConfig>(TOOLBAR_PRESETS.full)
 
     // r2wc does not re-render when a string attribute is removed (value becomes null).
@@ -80,6 +82,7 @@ export function TiptapWCAdapter({ value }: TiptapWCProps) {
         const syncHostAttributes = () => {
             setIsReadOnly(host.hasAttribute("readonly"))
             setIsDisabled(host.hasAttribute("disabled"))
+            setPlaceholder(host.getAttribute("placeholder") ?? undefined)
             setToolbarConfig(resolveToolbar(host))
         }
         syncHostAttributes()
@@ -87,7 +90,7 @@ export function TiptapWCAdapter({ value }: TiptapWCProps) {
         const observer = new MutationObserver(syncHostAttributes)
         observer.observe(host, {
             attributes: true,
-            attributeFilter: ["readonly", "disabled", "toolbar", "toolbar-items"],
+            attributeFilter: ["readonly", "disabled", "placeholder", "toolbar", "toolbar-items"],
         })
         return () => observer.disconnect()
     }, [])
@@ -130,6 +133,7 @@ export function TiptapWCAdapter({ value }: TiptapWCProps) {
                     onContentChange={handleContentChange}
                     isReadOnly={isReadOnly}
                     isDisabled={isDisabled}
+                    placeholder={placeholder}
                     toolbar={toolbarConfig}
                 />
             </ShadowPortalContext.Provider>
