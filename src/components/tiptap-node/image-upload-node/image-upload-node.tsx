@@ -7,6 +7,11 @@ import { Button } from "@/components/tiptap-ui-primitive/button"
 import { CloseIcon } from "@/components/tiptap-icons/close-icon"
 import "@/components/tiptap-node/image-upload-node/image-upload-node.scss"
 import { focusNextNode, isValidPosition } from "@/lib/tiptap-utils"
+import {
+  formatMessage,
+  useTiptapMessages,
+  type TiptapMessages,
+} from "@/components/tiptap-web-component/tiptap-messages"
 
 export interface FileItem {
   /**
@@ -77,6 +82,10 @@ export interface UploadOptions {
    * @optional
    */
   onError?: (error: Error) => void
+  /**
+   * Localized labels for the upload UI and errors.
+   */
+  messages: TiptapMessages["image"]
 }
 
 /**
@@ -84,11 +93,15 @@ export interface UploadOptions {
  */
 function useFileUpload(options: UploadOptions) {
   const [fileItems, setFileItems] = useState<FileItem[]>([])
+  const getFilesLabel = (count: number) =>
+    count === 1 ? options.messages.fileSingular : options.messages.filePlural
 
   const uploadFile = async (file: File): Promise<string | null> => {
     if (file.size > options.maxSize) {
       const error = new Error(
-        `File size exceeds maximum allowed (${options.maxSize / 1024 / 1024}MB)`
+        formatMessage(options.messages.fileSizeExceeded, {
+          size: options.maxSize / 1024 / 1024,
+        })
       )
       options.onError?.(error)
       return null
@@ -109,7 +122,7 @@ function useFileUpload(options: UploadOptions) {
 
     try {
       if (!options.upload) {
-        throw new Error("Upload function is not defined")
+        throw new Error(options.messages.uploadFunctionMissing)
       }
 
       const url = await options.upload(
@@ -124,7 +137,7 @@ function useFileUpload(options: UploadOptions) {
         abortController.signal
       )
 
-      if (!url) throw new Error("Upload failed: No URL returned")
+      if (!url) throw new Error(options.messages.uploadNoUrl)
 
       if (!abortController.signal.aborted) {
         setFileItems((prev) =>
@@ -149,7 +162,7 @@ function useFileUpload(options: UploadOptions) {
           )
         )
         options.onError?.(
-          error instanceof Error ? error : new Error("Upload failed")
+          error instanceof Error ? error : new Error(options.messages.uploadFailed)
         )
       }
       return null
@@ -158,14 +171,17 @@ function useFileUpload(options: UploadOptions) {
 
   const uploadFiles = async (files: File[]): Promise<string[]> => {
     if (!files || files.length === 0) {
-      options.onError?.(new Error("No files to upload"))
+      options.onError?.(new Error(options.messages.noFilesToUpload))
       return []
     }
 
     if (options.limit && files.length > options.limit) {
       options.onError?.(
         new Error(
-          `Maximum ${options.limit} file${options.limit === 1 ? "" : "s"} allowed`
+          formatMessage(options.messages.maximumFilesAllowed, {
+            limit: options.limit,
+            files: getFilesLabel(options.limit),
+          })
         )
       )
       return []
@@ -408,9 +424,14 @@ const ImageUploadPreview: React.FC<ImageUploadPreviewProps> = ({
   )
 }
 
-const DropZoneContent: React.FC<{ maxSize: number; limit: number }> = ({
+const DropZoneContent: React.FC<{
+  maxSize: number
+  limit: number
+  messages: TiptapMessages["image"]
+}> = ({
   maxSize,
   limit,
+  messages,
 }) => (
   <>
     <div className="tiptap-image-upload-dropzone">
@@ -423,11 +444,14 @@ const DropZoneContent: React.FC<{ maxSize: number; limit: number }> = ({
 
     <div className="tiptap-image-upload-content">
       <span className="tiptap-image-upload-text">
-        <em>Click to upload</em> or drag and drop
+        <em>{messages.clickToUpload}</em> {messages.dragAndDrop}
       </span>
       <span className="tiptap-image-upload-subtext">
-        Maximum {limit} file{limit === 1 ? "" : "s"}, {maxSize / 1024 / 1024}MB
-        each.
+        {formatMessage(messages.maximumFiles, {
+          limit,
+          files: limit === 1 ? messages.fileSingular : messages.filePlural,
+          size: maxSize / 1024 / 1024,
+        })}
       </span>
     </div>
   </>
@@ -437,6 +461,8 @@ export const ImageUploadNode: React.FC<NodeViewProps> = (props) => {
   const { accept, limit, maxSize } = props.node.attrs
   const inputRef = useRef<HTMLInputElement>(null)
   const extension = props.extension
+  const contextMessages = useTiptapMessages()
+  const imageMessages = extension.options.messages ?? contextMessages.image
 
   const uploadOptions: UploadOptions = {
     maxSize,
@@ -445,6 +471,7 @@ export const ImageUploadNode: React.FC<NodeViewProps> = (props) => {
     upload: extension.options.upload,
     onSuccess: extension.options.onSuccess,
     onError: extension.options.onError,
+    messages: imageMessages,
   }
 
   const { fileItems, uploadFiles, removeFileItem, clearAllFiles } =
@@ -486,7 +513,7 @@ export const ImageUploadNode: React.FC<NodeViewProps> = (props) => {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files
     if (!files || files.length === 0) {
-      extension.options.onError?.(new Error("No file selected"))
+      extension.options.onError?.(new Error(imageMessages.noFileSelected))
       return
     }
     handleUpload(Array.from(files))
@@ -509,7 +536,11 @@ export const ImageUploadNode: React.FC<NodeViewProps> = (props) => {
     >
       {!hasFiles && (
         <ImageUploadDragArea onFile={handleUpload}>
-          <DropZoneContent maxSize={maxSize} limit={limit} />
+          <DropZoneContent
+            maxSize={maxSize}
+            limit={limit}
+            messages={imageMessages}
+          />
         </ImageUploadDragArea>
       )}
 
@@ -517,7 +548,15 @@ export const ImageUploadNode: React.FC<NodeViewProps> = (props) => {
         <div className="tiptap-image-upload-previews">
           {fileItems.length > 1 && (
             <div className="tiptap-image-upload-header">
-              <span>Uploading {fileItems.length} files</span>
+              <span>
+                {formatMessage(imageMessages.uploadingFiles, {
+                  count: fileItems.length,
+                  files:
+                    fileItems.length === 1
+                      ? imageMessages.fileSingular
+                      : imageMessages.filePlural,
+                })}
+              </span>
               <Button
                 type="button"
                 variant="ghost"
@@ -526,7 +565,7 @@ export const ImageUploadNode: React.FC<NodeViewProps> = (props) => {
                   clearAllFiles()
                 }}
               >
-                Clear All
+                {imageMessages.clearAll}
               </Button>
             </div>
           )}

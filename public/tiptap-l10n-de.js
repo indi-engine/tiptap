@@ -49,7 +49,21 @@ window.TIPTAP_L10N.de = {
     remove: 'Link entfernen'
   },
   image: {
-    add: 'Bild hinzufuegen'
+    add: 'Bild hinzufuegen',
+    clickToUpload: 'Zum Hochladen klicken',
+    dragAndDrop: 'oder per Drag-and-drop ablegen',
+    maximumFiles: 'Maximal {limit} {files}, jeweils {size}MB.',
+    fileSingular: 'Datei',
+    filePlural: 'Dateien',
+    uploadingFiles: '{count} {files} werden hochgeladen',
+    clearAll: 'Alle entfernen',
+    noFileSelected: 'Keine Datei ausgewaehlt',
+    noFilesToUpload: 'Keine Dateien zum Hochladen',
+    fileSizeExceeded: 'Dateigroesse ueberschreitet das Maximum ({size}MB)',
+    uploadFunctionMissing: 'Upload-Funktion ist nicht definiert',
+    uploadNoUrl: 'Upload fehlgeschlagen: Keine URL zurueckgegeben',
+    uploadFailed: 'Upload fehlgeschlagen',
+    maximumFilesAllowed: 'Maximal {limit} {files} erlaubt'
   },
   colors: {
     textColor: 'Textfarbe',

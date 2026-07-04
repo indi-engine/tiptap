@@ -392,6 +392,7 @@ export function SimpleEditor({
         limit: 3,
         upload: handleImageUpload,
         onError: (error) => console.error("Upload failed:", error),
+        messages: messages.image,
       }),
     ],
     content: content ?? "<p></p>",

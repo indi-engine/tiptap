@@ -2,6 +2,7 @@ import { mergeAttributes, Node } from "@tiptap/react"
 import { ReactNodeViewRenderer } from "@tiptap/react"
 import { ImageUploadNode as ImageUploadNodeComponent } from "@/components/tiptap-node/image-upload-node/image-upload-node"
 import type { NodeType } from "@tiptap/pm/model"
+import type { TiptapMessages } from "@/components/tiptap-web-component/tiptap-messages"
 
 export type UploadFunction = (
   file: File,
@@ -43,6 +44,10 @@ export interface ImageUploadNodeOptions {
    */
   onSuccess?: (url: string) => void
   /**
+   * Localized labels for the upload UI and errors.
+   */
+  messages?: TiptapMessages["image"]
+  /**
    * HTML attributes to add to the image element.
    * @default {}
    * @example { class: 'foo' }
@@ -82,6 +87,7 @@ export const ImageUploadNode = Node.create<ImageUploadNodeOptions>({
       upload: undefined,
       onError: undefined,
       onSuccess: undefined,
+      messages: undefined,
       HTMLAttributes: {},
     }
   },
