@@ -1,0 +1,15 @@
+{
+  "name": "indi-engine/tiptap",
+  "description": "TipTap rich text editor exported as a custom HTML element.",
+  "type": "library",
+  "license": "proprietary",
+  "keywords": [
+    "tiptap",
+    "rich-text",
+    "wysiwyg",
+    "web-component",
+    "custom-element"
+  ],
+  "homepage": "https://github.com/indi-engine/tiptap",
+  "require": {}
+}
