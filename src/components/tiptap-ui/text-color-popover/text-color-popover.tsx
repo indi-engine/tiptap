@@ -90,15 +90,13 @@ export const TextColorPopoverButton = forwardRef<
 TextColorPopoverButton.displayName = "TextColorPopoverButton"
 
 const DEFAULT_TEXT_COLORS = pickTextColorsByValue([
-  "var(--tt-color-text-gray)",
-  "var(--tt-color-text-brown)",
-  "var(--tt-color-text-orange)",
-  "var(--tt-color-text-yellow)",
-  "var(--tt-color-text-green)",
-  "var(--tt-color-text-blue)",
-  "var(--tt-color-text-purple)",
-  "var(--tt-color-text-pink)",
-  "var(--tt-color-text-red)",
+  "var(--palette-color-1)",
+  "var(--palette-color-2)",
+  "var(--palette-color-3)",
+  "var(--palette-color-4)",
+  "var(--palette-color-5)",
+  "var(--palette-color-6)",
+  "var(--palette-color-7)",
 ])
 
 export function TextColorPopoverContent({

@@ -58,7 +58,7 @@ export function ColorHighlightShortcutBadge({
  *
  * // Node-based background coloring
  * <ColorHighlightButton
- *   highlightColor="var(--tt-color-highlight-blue)"
+ *   highlightColor="var(--palette-color-6)"
  *   mode="node"
  * />
  *

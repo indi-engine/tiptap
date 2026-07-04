@@ -70,7 +70,7 @@ body,
   display: table;
   flex-direction: column;
   flex: 1;
-  min-height: 45px;
+  min-height: 35px;
 }
 
 .simple-editor-content .tiptap.ProseMirror.simple-editor {
@@ -99,7 +99,6 @@ body,
 .simple-editor-content {
   flex: 1 1 auto;
   overflow-y: auto;
-  min-height: 45px;
 }
 
 .simple-editor-wrapper {

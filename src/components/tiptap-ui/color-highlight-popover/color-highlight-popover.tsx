@@ -98,11 +98,13 @@ ColorHighlightPopoverButton.displayName = "ColorHighlightPopoverButton"
 export function ColorHighlightPopoverContent({
   editor,
   colors = pickHighlightColorsByValue([
-    "var(--tt-color-highlight-green)",
-    "var(--tt-color-highlight-blue)",
-    "var(--tt-color-highlight-red)",
-    "var(--tt-color-highlight-purple)",
-    "var(--tt-color-highlight-yellow)",
+    "var(--palette-color-1)",
+    "var(--palette-color-2)",
+    "var(--palette-color-3)",
+    "var(--palette-color-4)",
+    "var(--palette-color-5)",
+    "var(--palette-color-6)",
+    "var(--palette-color-7)",
   ]),
   useColorValue = false,
 }: ColorHighlightPopoverContentProps) {
@@ -180,11 +182,13 @@ export function ColorHighlightPopoverContent({
 export function ColorHighlightPopover({
   editor: providedEditor,
   colors = pickHighlightColorsByValue([
-    "var(--tt-color-highlight-green)",
-    "var(--tt-color-highlight-blue)",
-    "var(--tt-color-highlight-red)",
-    "var(--tt-color-highlight-purple)",
-    "var(--tt-color-highlight-yellow)",
+    "var(--palette-color-1)",
+    "var(--palette-color-2)",
+    "var(--palette-color-3)",
+    "var(--palette-color-4)",
+    "var(--palette-color-5)",
+    "var(--palette-color-6)",
+    "var(--palette-color-7)",
   ]),
   hideWhenUnavailable = false,
   useColorValue = false,

@@ -18,58 +18,46 @@ import { TextColorIcon } from "@/components/tiptap-icons/text-color-icon"
 
 export const TEXT_COLORS = [
   {
-    label: "Gray text",
-    value: "var(--tt-color-text-gray)",
-    colorValue: "hsl(45, 2%, 46%)",
-    border: "var(--tt-color-text-gray-contrast)",
-  },
-  {
-    label: "Brown text",
-    value: "var(--tt-color-text-brown)",
-    colorValue: "hsl(19, 31%, 47%)",
-    border: "var(--tt-color-text-brown-contrast)",
-  },
-  {
-    label: "Orange text",
-    value: "var(--tt-color-text-orange)",
-    colorValue: "hsl(30, 89%, 45%)",
-    border: "var(--tt-color-text-orange-contrast)",
-  },
-  {
-    label: "Yellow text",
-    value: "var(--tt-color-text-yellow)",
-    colorValue: "hsl(38, 62%, 49%)",
-    border: "var(--tt-color-text-yellow-contrast)",
-  },
-  {
     label: "Green text",
-    value: "var(--tt-color-text-green)",
-    colorValue: "hsl(148, 32%, 39%)",
-    border: "var(--tt-color-text-green-contrast)",
-  },
-  {
-    label: "Blue text",
-    value: "var(--tt-color-text-blue)",
-    colorValue: "hsl(202, 54%, 43%)",
-    border: "var(--tt-color-text-blue-contrast)",
-  },
-  {
-    label: "Purple text",
-    value: "var(--tt-color-text-purple)",
-    colorValue: "hsl(274, 32%, 54%)",
-    border: "var(--tt-color-text-purple-contrast)",
-  },
-  {
-    label: "Pink text",
-    value: "var(--tt-color-text-pink)",
-    colorValue: "hsl(328, 49%, 53%)",
-    border: "var(--tt-color-text-pink-contrast)",
+    value: "var(--palette-color-1)",
+    colorValue: "var(--palette-color-1)",
+    border: "var(--palette-color-1-contrast)",
   },
   {
     label: "Red text",
-    value: "var(--tt-color-text-red)",
-    colorValue: "hsl(2, 62%, 55%)",
-    border: "var(--tt-color-text-red-contrast)",
+    value: "var(--palette-color-2)",
+    colorValue: "var(--palette-color-2)",
+    border: "var(--palette-color-2-contrast)",
+  },
+  {
+    label: "Orange text",
+    value: "var(--palette-color-3)",
+    colorValue: "var(--palette-color-3)",
+    border: "var(--palette-color-3-contrast)",
+  },
+  {
+    label: "Blue text",
+    value: "var(--palette-color-4)",
+    colorValue: "var(--palette-color-4)",
+    border: "var(--palette-color-4-contrast)",
+  },
+  {
+    label: "Cyan text",
+    value: "var(--palette-color-5)",
+    colorValue: "var(--palette-color-5)",
+    border: "var(--palette-color-5-contrast)",
+  },
+  {
+    label: "Sky text",
+    value: "var(--palette-color-6)",
+    colorValue: "var(--palette-color-6)",
+    border: "var(--palette-color-6-contrast)",
+  },
+  {
+    label: "Purple text",
+    value: "var(--palette-color-7)",
+    colorValue: "var(--palette-color-7)",
+    border: "var(--palette-color-7-contrast)",
   },
 ]
 
