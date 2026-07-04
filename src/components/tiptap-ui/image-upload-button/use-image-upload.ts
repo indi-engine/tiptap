@@ -7,7 +7,10 @@ import { type Editor } from "@tiptap/react"
 // --- Hooks ---
 import { useTiptapEditor } from "@/hooks/use-tiptap-editor"
 import { useIsBreakpoint } from "@/hooks/use-is-breakpoint"
-import { useTiptapMessages } from "@/components/tiptap-web-component/tiptap-messages"
+import {
+  useTiptapMessages,
+  type TiptapMessages,
+} from "@/components/tiptap-web-component/tiptap-messages"
 
 // --- Lib ---
 import { isExtensionAvailable } from "@/lib/tiptap-utils"
@@ -57,7 +60,10 @@ export function isImageActive(editor: Editor | null): boolean {
 /**
  * Inserts an image in the editor
  */
-export function insertImage(editor: Editor | null): boolean {
+export function insertImage(
+  editor: Editor | null,
+  messages?: TiptapMessages["image"]
+): boolean {
   if (!editor || !editor.isEditable) return false
   if (!canInsertImage(editor)) return false
 
@@ -67,6 +73,9 @@ export function insertImage(editor: Editor | null): boolean {
       .focus()
       .insertContent({
         type: "imageUpload",
+        attrs: {
+          messages,
+        },
       })
       .run()
   } catch {
@@ -169,12 +178,12 @@ export function useImageUpload(config?: UseImageUploadConfig) {
   const handleImage = useCallback(() => {
     if (!editor) return false
 
-    const success = insertImage(editor)
+    const success = insertImage(editor, messages.image)
     if (success) {
       onInserted?.()
     }
     return success
-  }, [editor, onInserted])
+  }, [editor, messages.image, onInserted])
 
   useHotkeys(
     IMAGE_UPLOAD_SHORTCUT_KEY,

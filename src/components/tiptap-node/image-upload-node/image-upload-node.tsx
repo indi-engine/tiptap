@@ -458,11 +458,12 @@ const DropZoneContent: React.FC<{
 )
 
 export const ImageUploadNode: React.FC<NodeViewProps> = (props) => {
-  const { accept, limit, maxSize } = props.node.attrs
+  const { accept, limit, maxSize, messages: nodeMessages } = props.node.attrs
   const inputRef = useRef<HTMLInputElement>(null)
   const extension = props.extension
   const contextMessages = useTiptapMessages()
-  const imageMessages = extension.options.messages ?? contextMessages.image
+  const imageMessages =
+    nodeMessages ?? extension.options.messages ?? contextMessages.image
 
   const uploadOptions: UploadOptions = {
     maxSize,
@@ -490,7 +491,7 @@ export const ImageUploadNode: React.FC<NodeViewProps> = (props) => {
           return {
             type: extension.options.type,
             attrs: {
-              ...extension.options,
+              ...(extension.options.HTMLAttributes ?? {}),
               src: url,
               alt: filename,
               title: filename,

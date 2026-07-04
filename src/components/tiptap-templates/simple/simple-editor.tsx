@@ -436,6 +436,17 @@ export function SimpleEditor({
   }, [editor, isDisabled, messages.editor.ariaLabel])
 
   useEffect(() => {
+    const imageUploadExtension = editor?.extensionManager.extensions.find(
+      (extension) => extension.name === "imageUpload"
+    )
+
+    if (!imageUploadExtension) return
+
+    imageUploadExtension.options.messages = messages.image
+    editor?.view.dispatch(editor.state.tr)
+  }, [editor, messages.image])
+
+  useEffect(() => {
     if (!editor) return
 
     editor.view.dispatch(editor.state.tr)
