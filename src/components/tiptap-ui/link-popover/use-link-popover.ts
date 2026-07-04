@@ -3,6 +3,7 @@ import type { Editor } from "@tiptap/react"
 
 // --- Hooks ---
 import { useTiptapEditor } from "@/hooks/use-tiptap-editor"
+import { useTiptapMessages } from "@/components/tiptap-web-component/tiptap-messages"
 
 // --- Icons ---
 import { LinkIcon } from "@/components/tiptap-icons/link-icon"
@@ -277,6 +278,7 @@ export function useLinkPopover(config?: UseLinkPopoverConfig) {
   } = config || {}
 
   const { editor } = useTiptapEditor(providedEditor)
+  const messages = useTiptapMessages()
 
   const { isVisible, canSet, isActive } = useLinkState({
     editor,
@@ -292,7 +294,7 @@ export function useLinkPopover(config?: UseLinkPopoverConfig) {
     isVisible,
     canSet,
     isActive,
-    label: "Link",
+    label: messages.link.label,
     Icon: LinkIcon,
     ...linkHandler,
   }

@@ -5,10 +5,12 @@ import { MoonStarIcon } from "@/components/tiptap-icons/moon-star-icon"
 import { SunIcon } from "@/components/tiptap-icons/sun-icon"
 import { useEffect, useState } from "react"
 import { useShadowPortalContainer } from "@/components/tiptap-web-component/shadow-portal-context"
+import { useTiptapMessages } from "@/components/tiptap-web-component/tiptap-messages"
 
 export function ThemeToggle() {
   const [isDarkMode, setIsDarkMode] = useState<boolean>(false)
   const portalContainer = useShadowPortalContainer()
+  const messages = useTiptapMessages()
 
     useEffect(() => {
     const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)")
@@ -38,7 +40,9 @@ export function ThemeToggle() {
   return (
     <Button
       onClick={toggleDarkMode}
-      aria-label={`Switch to ${isDarkMode ? "light" : "dark"} mode`}
+      aria-label={
+        isDarkMode ? messages.theme.switchToLight : messages.theme.switchToDark
+      }
       variant="ghost"
     >
       {isDarkMode ? (

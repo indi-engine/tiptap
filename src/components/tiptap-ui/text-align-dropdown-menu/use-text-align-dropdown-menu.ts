@@ -5,6 +5,10 @@ import type { Editor } from "@tiptap/react"
 
 // --- Hooks ---
 import { useTiptapEditor } from "@/hooks/use-tiptap-editor"
+import {
+  type TiptapMessages,
+  useTiptapMessages,
+} from "@/components/tiptap-web-component/tiptap-messages"
 
 // --- Tiptap UI ---
 import {
@@ -40,28 +44,32 @@ export interface TextAlignOption {
   icon: React.ElementType
 }
 
-export const textAlignOptions: TextAlignOption[] = [
-  {
-    label: "Align left",
-    type: "left",
-    icon: textAlignIcons.left,
-  },
-  {
-    label: "Align center",
-    type: "center",
-    icon: textAlignIcons.center,
-  },
-  {
-    label: "Align right",
-    type: "right",
-    icon: textAlignIcons.right,
-  },
-  {
-    label: "Align justify",
-    type: "justify",
-    icon: textAlignIcons.justify,
-  },
-]
+export function getTextAlignOptions(
+  messages: TiptapMessages
+): TextAlignOption[] {
+  return [
+    {
+      label: messages.alignment.left,
+      type: "left",
+      icon: textAlignIcons.left,
+    },
+    {
+      label: messages.alignment.center,
+      type: "center",
+      icon: textAlignIcons.center,
+    },
+    {
+      label: messages.alignment.right,
+      type: "right",
+      icon: textAlignIcons.right,
+    },
+    {
+      label: messages.alignment.justify,
+      type: "justify",
+      icon: textAlignIcons.justify,
+    },
+  ]
+}
 
 export function canSetAnyTextAlign(
   editor: Editor | null,
@@ -117,11 +125,12 @@ export function useTextAlignDropdownMenu(
   } = config || {}
 
   const { editor } = useTiptapEditor(providedEditor)
+  const messages = useTiptapMessages()
   const [isVisible, setIsVisible] = useState(true)
 
   const filteredAlignments = useMemo(
-    () => textAlignOptions.filter((option) => types.includes(option.type)),
-    [types]
+    () => getTextAlignOptions(messages).filter((option) => types.includes(option.type)),
+    [messages, types]
   )
 
   const canSetAny = canSetAnyTextAlign(editor, types)
@@ -160,7 +169,7 @@ export function useTextAlignDropdownMenu(
     canToggle: canSetAny,
     types,
     filteredAlignments,
-    label: "Text align",
+    label: messages.alignment.label,
     Icon: activeAlignment ? textAlignIcons[activeAlignment.type] : AlignLeftIcon,
   }
 }

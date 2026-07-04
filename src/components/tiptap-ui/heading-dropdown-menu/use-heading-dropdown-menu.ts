@@ -5,6 +5,7 @@ import type { Editor } from "@tiptap/react"
 
 // --- Hooks ---
 import { useTiptapEditor } from "@/hooks/use-tiptap-editor"
+import { useTiptapMessages } from "@/components/tiptap-web-component/tiptap-messages"
 
 // --- Icons ---
 import { HeadingIcon } from "@/components/tiptap-icons/heading-icon"
@@ -96,6 +97,7 @@ export function useHeadingDropdownMenu(config?: UseHeadingDropdownMenuConfig) {
   } = config || {}
 
   const { editor } = useTiptapEditor(providedEditor)
+  const messages = useTiptapMessages()
   const [isVisible, setIsVisible] = useState(true)
 
   const activeLevel = getActiveHeadingLevel(editor, levels)
@@ -126,7 +128,7 @@ export function useHeadingDropdownMenu(config?: UseHeadingDropdownMenuConfig) {
     isActive,
     canToggle: canToggleState,
     levels,
-    label: "Heading",
+    label: messages.blocks.heading,
     Icon: activeLevel ? headingIcons[activeLevel] : HeadingIcon,
   }
 }

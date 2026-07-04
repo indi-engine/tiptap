@@ -5,6 +5,7 @@ import { type Editor } from "@tiptap/react"
 import { useMenuNavigation } from "@/hooks/use-menu-navigation"
 import { useIsBreakpoint } from "@/hooks/use-is-breakpoint"
 import { useTiptapEditor } from "@/hooks/use-tiptap-editor"
+import { useTiptapMessages } from "@/components/tiptap-web-component/tiptap-messages"
 
 // --- Icons ---
 import { BanIcon } from "@/components/tiptap-icons/ban-icon"
@@ -71,25 +72,42 @@ export const TextColorPopoverButton = forwardRef<
   HTMLButtonElement,
   ButtonProps
 >(({ className, children, ...props }, ref) => (
-  <Button
-    type="button"
+  <TextColorPopoverButtonInner
     className={className}
-    variant="ghost"
-    data-appearance="default"
-    role="button"
-    tabIndex={-1}
-    aria-label="Set text color"
-    tooltip="Text color"
     ref={ref}
     {...props}
   >
-    {children ?? <TextColorIcon className="tiptap-button-icon" />}
-  </Button>
+    {children}
+  </TextColorPopoverButtonInner>
 ))
+
+const TextColorPopoverButtonInner = forwardRef<
+  HTMLButtonElement,
+  ButtonProps
+>(({ className, children, ...props }, ref) => {
+  const messages = useTiptapMessages()
+
+  return (
+    <Button
+      type="button"
+      className={className}
+      variant="ghost"
+      data-appearance="default"
+      role="button"
+      tabIndex={-1}
+      aria-label={messages.colors.textColor}
+      tooltip={messages.colors.textColor}
+      ref={ref}
+      {...props}
+    >
+      {children ?? <TextColorIcon className="tiptap-button-icon" />}
+    </Button>
+  )
+})
 
 TextColorPopoverButton.displayName = "TextColorPopoverButton"
 
-const DEFAULT_TEXT_COLORS = pickTextColorsByValue([
+const DEFAULT_TEXT_COLOR_VALUES = [
   "var(--palette-color-1)",
   "var(--palette-color-2)",
   "var(--palette-color-3)",
@@ -97,20 +115,22 @@ const DEFAULT_TEXT_COLORS = pickTextColorsByValue([
   "var(--palette-color-5)",
   "var(--palette-color-6)",
   "var(--palette-color-7)",
-])
+]
 
 export function TextColorPopoverContent({
   editor,
-  colors = DEFAULT_TEXT_COLORS,
+  colors,
   useColorValue = false,
 }: TextColorPopoverContentProps) {
+  const messages = useTiptapMessages()
+  const resolvedColors = colors ?? pickTextColorsByValue(DEFAULT_TEXT_COLOR_VALUES, messages)
   const { handleRemoveTextColor } = useTextColor({ editor })
   const isMobile = useIsBreakpoint()
   const containerRef = useRef<HTMLDivElement>(null)
 
   const menuItems = useMemo(
-    () => [...colors, { label: "Remove text color", value: "none" }],
-    [colors]
+    () => [...resolvedColors, { label: messages.colors.removeTextColor, value: "none" }],
+    [messages.colors.removeTextColor, resolvedColors]
   )
 
   const { selectedIndex } = useMenuNavigation({
@@ -138,7 +158,7 @@ export function TextColorPopoverContent({
       <CardBody style={isMobile ? { padding: 0 } : {}}>
         <CardItemGroup orientation="horizontal">
           <ButtonGroup>
-            {colors.map((color, index) => (
+            {resolvedColors.map((color, index) => (
               <ButtonGroup key={color.value}>
                 <TextColorButton
                   editor={editor}
@@ -156,13 +176,13 @@ export function TextColorPopoverContent({
           <ButtonGroup>
             <Button
               onClick={handleRemoveTextColor}
-              aria-label="Remove text color"
-              tooltip="Remove text color"
-              tabIndex={selectedIndex === colors.length ? 0 : -1}
+              aria-label={messages.colors.removeTextColor}
+              tooltip={messages.colors.removeTextColor}
+              tabIndex={selectedIndex === resolvedColors.length ? 0 : -1}
               type="button"
               role="menuitem"
               variant="ghost"
-              data-highlighted={selectedIndex === colors.length}
+              data-highlighted={selectedIndex === resolvedColors.length}
             >
               <BanIcon className="tiptap-button-icon" />
             </Button>
@@ -175,13 +195,15 @@ export function TextColorPopoverContent({
 
 export function TextColorPopover({
   editor: providedEditor,
-  colors = DEFAULT_TEXT_COLORS,
+  colors,
   hideWhenUnavailable = false,
   useColorValue = false,
   onApplied,
   ...props
 }: TextColorPopoverProps) {
   const { editor } = useTiptapEditor(providedEditor)
+  const messages = useTiptapMessages()
+  const resolvedColors = colors ?? pickTextColorsByValue(DEFAULT_TEXT_COLOR_VALUES, messages)
   const [isOpen, setIsOpen] = useState(false)
   const { isVisible, canSetTextColor, isActive, label, Icon } = useTextColor({
     editor,
@@ -206,10 +228,10 @@ export function TextColorPopover({
           <Icon className="tiptap-button-icon" />
         </TextColorPopoverButton>
       </PopoverTrigger>
-      <PopoverContent aria-label="Text colors">
+      <PopoverContent aria-label={messages.colors.textColor}>
         <TextColorPopoverContent
           editor={editor}
-          colors={colors}
+          colors={resolvedColors}
           useColorValue={useColorValue}
         />
       </PopoverContent>

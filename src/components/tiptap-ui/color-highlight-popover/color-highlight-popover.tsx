@@ -5,6 +5,7 @@ import { type Editor } from "@tiptap/react"
 import { useMenuNavigation } from "@/hooks/use-menu-navigation"
 import { useIsBreakpoint } from "@/hooks/use-is-breakpoint"
 import { useTiptapEditor } from "@/hooks/use-tiptap-editor"
+import { useTiptapMessages } from "@/components/tiptap-web-component/tiptap-messages"
 
 // --- Icons ---
 import { BanIcon } from "@/components/tiptap-icons/ban-icon"
@@ -76,45 +77,54 @@ export interface ColorHighlightPopoverProps
 export const ColorHighlightPopoverButton = forwardRef<
   HTMLButtonElement,
   ButtonProps
->(({ className, children, ...props }, ref) => (
-  <Button
-    type="button"
-    className={className}
-    variant="ghost"
-    data-appearance="default"
-    role="button"
-    tabIndex={-1}
-    aria-label="Highlight text"
-    tooltip="Highlight"
-    ref={ref}
-    {...props}
-  >
-    {children ?? <HighlighterIcon className="tiptap-button-icon" />}
-  </Button>
-))
+>(({ className, children, ...props }, ref) => {
+  const messages = useTiptapMessages()
+
+  return (
+    <Button
+      type="button"
+      className={className}
+      variant="ghost"
+      data-appearance="default"
+      role="button"
+      tabIndex={-1}
+      aria-label={messages.colors.highlight}
+      tooltip={messages.colors.highlight}
+      ref={ref}
+      {...props}
+    >
+      {children ?? <HighlighterIcon className="tiptap-button-icon" />}
+    </Button>
+  )
+})
 
 ColorHighlightPopoverButton.displayName = "ColorHighlightPopoverButton"
 
+const DEFAULT_HIGHLIGHT_COLOR_VALUES = [
+  "var(--palette-color-1)",
+  "var(--palette-color-2)",
+  "var(--palette-color-3)",
+  "var(--palette-color-4)",
+  "var(--palette-color-5)",
+  "var(--palette-color-6)",
+  "var(--palette-color-7)",
+]
+
 export function ColorHighlightPopoverContent({
   editor,
-  colors = pickHighlightColorsByValue([
-    "var(--palette-color-1)",
-    "var(--palette-color-2)",
-    "var(--palette-color-3)",
-    "var(--palette-color-4)",
-    "var(--palette-color-5)",
-    "var(--palette-color-6)",
-    "var(--palette-color-7)",
-  ]),
+  colors,
   useColorValue = false,
 }: ColorHighlightPopoverContentProps) {
+  const messages = useTiptapMessages()
+  const resolvedColors =
+    colors ?? pickHighlightColorsByValue(DEFAULT_HIGHLIGHT_COLOR_VALUES, messages)
   const { handleRemoveHighlight } = useColorHighlight({ editor })
   const isMobile = useIsBreakpoint()
   const containerRef = useRef<HTMLDivElement>(null)
 
   const menuItems = useMemo(
-    () => [...colors, { label: "Remove highlight", value: "none" }],
-    [colors]
+    () => [...resolvedColors, { label: messages.colors.removeHighlight, value: "none" }],
+    [messages.colors.removeHighlight, resolvedColors]
   )
 
   const { selectedIndex } = useMenuNavigation({
@@ -142,7 +152,7 @@ export function ColorHighlightPopoverContent({
       <CardBody style={isMobile ? { padding: 0 } : {}}>
         <CardItemGroup orientation="horizontal">
           <ButtonGroup>
-            {colors.map((color, index) => (
+            {resolvedColors.map((color, index) => (
               <ButtonGroup key={color.value}>
                 <ColorHighlightButton
                   editor={editor}
@@ -162,13 +172,13 @@ export function ColorHighlightPopoverContent({
           <ButtonGroup>
             <Button
               onClick={handleRemoveHighlight}
-              aria-label="Remove highlight"
-              tooltip="Remove highlight"
-              tabIndex={selectedIndex === colors.length ? 0 : -1}
+              aria-label={messages.colors.removeHighlight}
+              tooltip={messages.colors.removeHighlight}
+              tabIndex={selectedIndex === resolvedColors.length ? 0 : -1}
               type="button"
               role="menuitem"
               variant="ghost"
-              data-highlighted={selectedIndex === colors.length}
+              data-highlighted={selectedIndex === resolvedColors.length}
             >
               <BanIcon className="tiptap-button-icon" />
             </Button>
@@ -181,21 +191,16 @@ export function ColorHighlightPopoverContent({
 
 export function ColorHighlightPopover({
   editor: providedEditor,
-  colors = pickHighlightColorsByValue([
-    "var(--palette-color-1)",
-    "var(--palette-color-2)",
-    "var(--palette-color-3)",
-    "var(--palette-color-4)",
-    "var(--palette-color-5)",
-    "var(--palette-color-6)",
-    "var(--palette-color-7)",
-  ]),
+  colors,
   hideWhenUnavailable = false,
   useColorValue = false,
   onApplied,
   ...props
 }: ColorHighlightPopoverProps) {
   const { editor } = useTiptapEditor(providedEditor)
+  const messages = useTiptapMessages()
+  const resolvedColors =
+    colors ?? pickHighlightColorsByValue(DEFAULT_HIGHLIGHT_COLOR_VALUES, messages)
   const [isOpen, setIsOpen] = useState(false)
   const { isVisible, canColorHighlight, isActive, label, Icon } =
     useColorHighlight({
@@ -221,10 +226,10 @@ export function ColorHighlightPopover({
           <Icon className="tiptap-button-icon" />
         </ColorHighlightPopoverButton>
       </PopoverTrigger>
-      <PopoverContent aria-label="Highlight colors">
+      <PopoverContent aria-label={messages.colors.highlight}>
         <ColorHighlightPopoverContent
           editor={editor}
-          colors={colors}
+          colors={resolvedColors}
           useColorValue={useColorValue}
         />
       </PopoverContent>

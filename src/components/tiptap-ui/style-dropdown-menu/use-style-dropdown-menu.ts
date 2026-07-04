@@ -5,6 +5,10 @@ import type { Editor } from "@tiptap/react"
 
 // --- Hooks ---
 import { useTiptapEditor } from "@/hooks/use-tiptap-editor"
+import {
+  type TiptapMessages,
+  useTiptapMessages,
+} from "@/components/tiptap-web-component/tiptap-messages"
 
 // --- Tiptap UI ---
 import {
@@ -45,43 +49,45 @@ export interface StyleOption {
   icon: React.ElementType
 }
 
-export const styleOptions: StyleOption[] = [
-  {
-    label: "Bold",
-    type: "bold",
-    icon: markIcons.bold,
-  },
-  {
-    label: "Italic",
-    type: "italic",
-    icon: markIcons.italic,
-  },
-  {
-    label: "Underline",
-    type: "underline",
-    icon: markIcons.underline,
-  },
-  {
-    label: "Code",
-    type: "code",
-    icon: markIcons.code,
-  },
-  {
-    label: "Strike",
-    type: "strike",
-    icon: markIcons.strike,
-  },
-  {
-    label: "Subscript",
-    type: "subscript",
-    icon: markIcons.subscript,
-  },
-  {
-    label: "Superscript",
-    type: "superscript",
-    icon: markIcons.superscript,
-  },
-]
+export function getStyleOptions(messages: TiptapMessages): StyleOption[] {
+  return [
+    {
+      label: messages.marks.bold,
+      type: "bold",
+      icon: markIcons.bold,
+    },
+    {
+      label: messages.marks.italic,
+      type: "italic",
+      icon: markIcons.italic,
+    },
+    {
+      label: messages.marks.underline,
+      type: "underline",
+      icon: markIcons.underline,
+    },
+    {
+      label: messages.marks.code,
+      type: "code",
+      icon: markIcons.code,
+    },
+    {
+      label: messages.marks.strike,
+      type: "strike",
+      icon: markIcons.strike,
+    },
+    {
+      label: messages.marks.subscript,
+      type: "subscript",
+      icon: markIcons.subscript,
+    },
+    {
+      label: messages.marks.superscript,
+      type: "superscript",
+      icon: markIcons.superscript,
+    },
+  ]
+}
 
 export function canToggleAnyStyleMark(
   editor: Editor | null,
@@ -135,11 +141,12 @@ export function useStyleDropdownMenu(config?: UseStyleDropdownMenuConfig) {
   } = config || {}
 
   const { editor } = useTiptapEditor(providedEditor)
+  const messages = useTiptapMessages()
   const [isVisible, setIsVisible] = useState(true)
 
   const filteredStyles = useMemo(
-    () => styleOptions.filter((option) => types.includes(option.type)),
-    [types]
+    () => getStyleOptions(messages).filter((option) => types.includes(option.type)),
+    [messages, types]
   )
 
   const canToggleAny = canToggleAnyStyleMark(editor, types)
@@ -176,7 +183,7 @@ export function useStyleDropdownMenu(config?: UseStyleDropdownMenuConfig) {
     canToggle: canToggleAny,
     types,
     filteredStyles,
-    label: "Style",
+    label: messages.style.label,
     Icon: activeStyle ? markIcons[activeStyle.type] : BoldIcon,
   }
 }

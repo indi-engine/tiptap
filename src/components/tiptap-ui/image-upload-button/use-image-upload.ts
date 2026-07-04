@@ -7,6 +7,7 @@ import { type Editor } from "@tiptap/react"
 // --- Hooks ---
 import { useTiptapEditor } from "@/hooks/use-tiptap-editor"
 import { useIsBreakpoint } from "@/hooks/use-is-breakpoint"
+import { useTiptapMessages } from "@/components/tiptap-web-component/tiptap-messages"
 
 // --- Lib ---
 import { isExtensionAvailable } from "@/lib/tiptap-utils"
@@ -143,6 +144,7 @@ export function useImageUpload(config?: UseImageUploadConfig) {
   } = config || {}
 
   const { editor } = useTiptapEditor(providedEditor)
+  const messages = useTiptapMessages()
   const isMobile = useIsBreakpoint()
   const [isVisible, setIsVisible] = useState<boolean>(true)
   const canInsert = canInsertImage(editor)
@@ -192,7 +194,7 @@ export function useImageUpload(config?: UseImageUploadConfig) {
     isActive,
     handleImage,
     canInsert,
-    label: "Add image",
+    label: messages.image.add,
     shortcutKeys: IMAGE_UPLOAD_SHORTCUT_KEY,
     Icon: ImagePlusIcon,
   }

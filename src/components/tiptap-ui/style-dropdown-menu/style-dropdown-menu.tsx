@@ -3,6 +3,7 @@ import { type Editor } from "@tiptap/react"
 
 // --- Hooks ---
 import { useTiptapEditor } from "@/hooks/use-tiptap-editor"
+import { useTiptapMessages } from "@/components/tiptap-web-component/tiptap-messages"
 
 // --- Icons ---
 import { ChevronDownIcon } from "@/components/tiptap-icons/chevron-down-icon"
@@ -61,6 +62,7 @@ function StyleDropdownMenuImpl(
   ref: ForwardedRef<HTMLButtonElement>
 ) {
   const { editor } = useTiptapEditor(providedEditor)
+  const messages = useTiptapMessages()
   const [isOpen, setIsOpen] = useState(false)
 
   const { filteredStyles, canToggle, isActive, isVisible, Icon } =
@@ -93,8 +95,8 @@ function StyleDropdownMenuImpl(
           tabIndex={-1}
           disabled={!canToggle}
           data-disabled={!canToggle}
-          aria-label="Style options"
-          tooltip="Style"
+          aria-label={messages.style.options}
+          tooltip={messages.style.label}
           {...props}
           ref={ref}
         >

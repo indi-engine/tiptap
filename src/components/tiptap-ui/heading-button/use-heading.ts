@@ -6,6 +6,10 @@ import { NodeSelection, TextSelection } from "@tiptap/pm/state"
 
 // --- Hooks ---
 import { useTiptapEditor } from "@/hooks/use-tiptap-editor"
+import {
+  formatMessage,
+  useTiptapMessages,
+} from "@/components/tiptap-web-component/tiptap-messages"
 
 // --- Lib ---
 import {
@@ -306,6 +310,7 @@ export function useHeading(config: UseHeadingConfig) {
   } = config
 
   const { editor } = useTiptapEditor(providedEditor)
+  const messages = useTiptapMessages()
   const [isVisible, setIsVisible] = useState<boolean>(true)
   const canToggleState = canToggle(editor, level)
   const isActive = isHeadingActive(editor, level)
@@ -341,7 +346,7 @@ export function useHeading(config: UseHeadingConfig) {
     isActive,
     handleToggle,
     canToggle: canToggleState,
-    label: `Heading ${level}`,
+    label: formatMessage(messages.blocks.headingLevel, { level }),
     shortcutKeys: HEADING_SHORTCUT_KEYS[level],
     Icon: headingIcons[level],
   }

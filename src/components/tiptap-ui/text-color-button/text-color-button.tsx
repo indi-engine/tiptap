@@ -4,6 +4,7 @@ import { forwardRef, useCallback, useMemo } from "react"
 
 // --- Hooks ---
 import { useTiptapEditor } from "@/hooks/use-tiptap-editor"
+import { useTiptapMessages } from "@/components/tiptap-web-component/tiptap-messages"
 
 // --- Tiptap UI ---
 import type { UseTextColorConfig } from "@/components/tiptap-ui/text-color-button/use-text-color"
@@ -45,6 +46,7 @@ export const TextColorButton = forwardRef<
     ref
   ) => {
     const { editor } = useTiptapEditor(providedEditor)
+    const messages = useTiptapMessages()
     const {
       isVisible,
       canSetTextColor,
@@ -55,7 +57,7 @@ export const TextColorButton = forwardRef<
       editor,
       textColor,
       useColorValue,
-      label: text || `Text color (${textColor})`,
+      label: text || `${messages.colors.textColor} (${textColor})`,
       hideWhenUnavailable,
       onApplied,
     })

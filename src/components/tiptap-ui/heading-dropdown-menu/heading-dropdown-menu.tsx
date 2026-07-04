@@ -5,6 +5,10 @@ import { ChevronDownIcon } from "@/components/tiptap-icons/chevron-down-icon"
 
 // --- Hooks ---
 import { useTiptapEditor } from "@/hooks/use-tiptap-editor"
+import {
+  formatMessage,
+  useTiptapMessages,
+} from "@/components/tiptap-web-component/tiptap-messages"
 
 // --- Tiptap UI ---
 import { HeadingButton } from "@/components/tiptap-ui/heading-button"
@@ -56,6 +60,7 @@ export const HeadingDropdownMenu = forwardRef<
     ref
   ) => {
     const { editor } = useTiptapEditor(providedEditor)
+    const messages = useTiptapMessages()
     const [isOpen, setIsOpen] = useState<boolean>(false)
     const { isVisible, isActive, canToggle, Icon } = useHeadingDropdownMenu({
       editor,
@@ -87,9 +92,9 @@ export const HeadingDropdownMenu = forwardRef<
             tabIndex={-1}
             disabled={!canToggle}
             data-disabled={!canToggle}
-            aria-label="Format text as heading"
+            aria-label={messages.blocks.headingOptions}
             aria-pressed={isActive}
-            tooltip="Heading"
+            tooltip={messages.blocks.heading}
             {...buttonProps}
             ref={ref}
           >
@@ -111,7 +116,7 @@ export const HeadingDropdownMenu = forwardRef<
                 <HeadingButton
                   editor={editor}
                   level={level}
-                  text={`Heading ${level}`}
+                  text={formatMessage(messages.blocks.headingLevel, { level })}
                   showTooltip={false}
                 />
               </DropdownMenuItem>

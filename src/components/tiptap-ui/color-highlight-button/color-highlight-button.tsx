@@ -5,6 +5,7 @@ import { parseShortcutKeys } from "@/lib/tiptap-utils"
 
 // --- Hooks ---
 import { useTiptapEditor } from "@/hooks/use-tiptap-editor"
+import { useTiptapMessages } from "@/components/tiptap-web-component/tiptap-messages"
 
 // --- Tiptap UI ---
 import type { UseColorHighlightConfig } from "@/components/tiptap-ui/color-highlight-button"
@@ -92,6 +93,7 @@ export const ColorHighlightButton = forwardRef<
     ref
   ) => {
     const { editor } = useTiptapEditor(providedEditor)
+    const messages = useTiptapMessages()
     const {
       isVisible,
       canColorHighlight,
@@ -103,7 +105,7 @@ export const ColorHighlightButton = forwardRef<
       editor,
       highlightColor,
       useColorValue,
-      label: text || `Toggle highlight (${highlightColor})`,
+      label: text || `${messages.colors.toggleHighlight} (${highlightColor})`,
       hideWhenUnavailable,
       mode,
       onApplied,

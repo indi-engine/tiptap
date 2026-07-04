@@ -6,6 +6,7 @@ import { NodeSelection, TextSelection } from "@tiptap/pm/state"
 
 // --- Hooks ---
 import { useTiptapEditor } from "@/hooks/use-tiptap-editor"
+import { useTiptapMessages } from "@/components/tiptap-web-component/tiptap-messages"
 
 // --- Lib ---
 import {
@@ -241,6 +242,7 @@ export function useCodeBlock(config?: UseCodeBlockConfig) {
   } = config || {}
 
   const { editor } = useTiptapEditor(providedEditor)
+  const messages = useTiptapMessages()
   const [isVisible, setIsVisible] = useState<boolean>(true)
   const canToggleState = canToggle(editor)
   const isActive = editor?.isActive("codeBlock") || false
@@ -276,7 +278,7 @@ export function useCodeBlock(config?: UseCodeBlockConfig) {
     isActive,
     handleToggle,
     canToggle: canToggleState,
-    label: "Code Block",
+    label: messages.blocks.codeBlock,
     shortcutKeys: CODE_BLOCK_SHORTCUT_KEY,
     Icon: CodeBlockIcon,
   }

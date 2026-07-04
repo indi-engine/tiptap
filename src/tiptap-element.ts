@@ -1,6 +1,9 @@
 // src/tiptap-element.ts
 import r2wc from '@r2wc/react-to-web-component'
 import { TiptapWCAdapter } from '@/components/tiptap-web-component/tiptap-wc-adapter'
+import { installTiptapMessageRegistry } from '@/components/tiptap-web-component/tiptap-messages'
+
+installTiptapMessageRegistry()
 
 const ReactTiptapElement = r2wc(TiptapWCAdapter, {
     props: {
@@ -8,6 +11,7 @@ const ReactTiptapElement = r2wc(TiptapWCAdapter, {
         toolbar: 'string',
         toolbarItems: 'string',
         placeholder: 'string',
+        locale: 'string',
         disabled: 'boolean',
     },
     shadow: 'open',
@@ -21,7 +25,7 @@ class TiptapElement extends ReactTiptapElement {
         const baseAttributes =
             (ReactTiptapElement as CustomElementConstructor & { observedAttributes?: string[] })
                 .observedAttributes ?? []
-        return Array.from(new Set([...baseAttributes, 'value', 'placeholder', 'disabled']))
+        return Array.from(new Set([...baseAttributes, 'value', 'placeholder', 'locale', 'disabled']))
     }
 
     connectedCallback() {
@@ -93,6 +97,14 @@ class TiptapElement extends ReactTiptapElement {
 
     set placeholder(value: string) {
         this.setAttribute('placeholder', String(value ?? ''))
+    }
+
+    get locale() {
+        return this.getAttribute('locale') ?? 'en'
+    }
+
+    set locale(value: string) {
+        this.setAttribute('locale', String(value ?? 'en'))
     }
 
     setValueFromEditor(value: string) {

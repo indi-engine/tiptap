@@ -83,6 +83,7 @@ import { useIsBreakpoint } from "@/hooks/use-is-breakpoint"
 import { useWindowSize } from "@/hooks/use-window-size"
 import { useCursorVisibility } from "@/hooks/use-cursor-visibility"
 import { useRefRect } from "@/hooks/use-element-rect"
+import { useTiptapMessages } from "@/components/tiptap-web-component/tiptap-messages"
 import {
   TOOLBAR_PRESETS,
   type ToolbarConfig,
@@ -332,6 +333,7 @@ export function SimpleEditor({
   toolbar = TOOLBAR_PRESETS.full,
 }: SimpleEditorProps) {
   const isMobile = useIsBreakpoint()
+  const messages = useTiptapMessages()
   const { height } = useWindowSize()
   const [mobileView, setMobileView] = useState<
     "main" | "highlighter" | "text-color" | "link"
@@ -355,7 +357,7 @@ export function SimpleEditor({
         autocomplete: "off",
         autocorrect: "off",
         autocapitalize: "off",
-        "aria-label": "Main content area, start typing to enter text.",
+        "aria-label": messages.editor.ariaLabel,
         "aria-disabled": String(isDisabled),
         class: "simple-editor",
       },
@@ -416,6 +418,21 @@ export function SimpleEditor({
   useEffect(() => {
     editor?.setEditable(isEditable)
   }, [editor, isEditable])
+
+  useEffect(() => {
+    editor?.setOptions({
+      editorProps: {
+        attributes: {
+          autocomplete: "off",
+          autocorrect: "off",
+          autocapitalize: "off",
+          "aria-label": messages.editor.ariaLabel,
+          "aria-disabled": String(isDisabled),
+          class: "simple-editor",
+        },
+      },
+    })
+  }, [editor, isDisabled, messages.editor.ariaLabel])
 
   useEffect(() => {
     if (!editor) return

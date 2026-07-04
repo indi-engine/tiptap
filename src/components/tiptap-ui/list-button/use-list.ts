@@ -6,6 +6,7 @@ import { NodeSelection, TextSelection } from "@tiptap/pm/state"
 
 // --- Hooks ---
 import { useTiptapEditor } from "@/hooks/use-tiptap-editor"
+import { useTiptapMessages } from "@/components/tiptap-web-component/tiptap-messages"
 
 // --- Icons ---
 import { ListIcon } from "@/components/tiptap-icons/list-icon"
@@ -311,6 +312,7 @@ export function useList(config: UseListConfig) {
   } = config
 
   const { editor } = useTiptapEditor(providedEditor)
+  const messages = useTiptapMessages()
   const [isVisible, setIsVisible] = useState<boolean>(true)
   const canToggle = canToggleList(editor, type)
   const isActive = isListActive(editor, type)
@@ -346,7 +348,12 @@ export function useList(config: UseListConfig) {
     isActive,
     handleToggle,
     canToggle,
-    label: listLabels[type],
+    label:
+      type === "bulletList"
+        ? messages.blocks.bulletList
+        : type === "orderedList"
+          ? messages.blocks.orderedList
+          : messages.blocks.taskList,
     shortcutKeys: LIST_SHORTCUT_KEYS[type],
     Icon: listIcons[type],
   }

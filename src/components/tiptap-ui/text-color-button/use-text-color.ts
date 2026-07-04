@@ -5,6 +5,10 @@ import { type Editor } from "@tiptap/react"
 
 // --- Hooks ---
 import { useTiptapEditor } from "@/hooks/use-tiptap-editor"
+import {
+  type TiptapMessages,
+  useTiptapMessages,
+} from "@/components/tiptap-web-component/tiptap-messages"
 
 // --- Lib ---
 import {
@@ -63,6 +67,18 @@ export const TEXT_COLORS = [
 
 export type TextColor = (typeof TEXT_COLORS)[number]
 
+export function getTextColors(messages: TiptapMessages): TextColor[] {
+  return [
+    { ...TEXT_COLORS[0], label: messages.colors.greenText },
+    { ...TEXT_COLORS[1], label: messages.colors.redText },
+    { ...TEXT_COLORS[2], label: messages.colors.orangeText },
+    { ...TEXT_COLORS[3], label: messages.colors.blueText },
+    { ...TEXT_COLORS[4], label: messages.colors.cyanText },
+    { ...TEXT_COLORS[5], label: messages.colors.skyText },
+    { ...TEXT_COLORS[6], label: messages.colors.purpleText },
+  ]
+}
+
 export interface UseTextColorConfig {
   /**
    * The Tiptap editor instance.
@@ -92,8 +108,12 @@ export interface UseTextColorConfig {
   onApplied?: ({ color, label }: { color: string; label: string }) => void
 }
 
-export function pickTextColorsByValue(values: string[]) {
-  const colorMap = new Map(TEXT_COLORS.map((color) => [color.value, color]))
+export function pickTextColorsByValue(
+  values: string[],
+  messages?: TiptapMessages
+) {
+  const colors = messages ? getTextColors(messages) : TEXT_COLORS
+  const colorMap = new Map(colors.map((color) => [color.value, color]))
   return values
     .map((value) => colorMap.get(value))
     .filter((color): color is (typeof TEXT_COLORS)[number] => !!color)
@@ -177,6 +197,7 @@ export function useTextColor(config: UseTextColorConfig = {}) {
   } = config
 
   const { editor } = useTiptapEditor(providedEditor)
+  const messages = useTiptapMessages()
   const [isVisible, setIsVisible] = useState<boolean>(true)
   const canSetTextColorState = canSetTextColor(editor)
   const actualColor = textColor
@@ -205,18 +226,18 @@ export function useTextColor(config: UseTextColorConfig = {}) {
 
     const success = setTextColor(editor, actualColor)
     if (success) {
-      onApplied?.({ color: actualColor, label: label || "Text color" })
+      onApplied?.({ color: actualColor, label: label || messages.colors.textColor })
     }
     return success
-  }, [actualColor, editor, label, onApplied])
+  }, [actualColor, editor, label, messages.colors.textColor, onApplied])
 
   const handleRemoveTextColor = useCallback(() => {
     const success = unsetTextColor(editor)
     if (success) {
-      onApplied?.({ color: "", label: "Remove text color" })
+      onApplied?.({ color: "", label: messages.colors.removeTextColor })
     }
     return success
-  }, [editor, onApplied])
+  }, [editor, messages.colors.removeTextColor, onApplied])
 
   return {
     isVisible,
@@ -224,7 +245,7 @@ export function useTextColor(config: UseTextColorConfig = {}) {
     handleTextColor,
     handleRemoveTextColor,
     canSetTextColor: canSetTextColorState,
-    label: label || "Text color",
+    label: label || messages.colors.textColor,
     Icon: TextColorIcon,
   }
 }

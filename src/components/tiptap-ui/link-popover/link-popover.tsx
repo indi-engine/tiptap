@@ -6,6 +6,7 @@ import type { Editor } from "@tiptap/react"
 // --- Hooks ---
 import { useIsBreakpoint } from "@/hooks/use-is-breakpoint"
 import { useTiptapEditor } from "@/hooks/use-tiptap-editor"
+import { useTiptapMessages } from "@/components/tiptap-web-component/tiptap-messages"
 
 // --- Icons ---
 import { CornerDownLeftIcon } from "@/components/tiptap-icons/corner-down-left-icon"
@@ -81,6 +82,8 @@ export interface LinkPopoverProps
  */
 export const LinkButton = forwardRef<HTMLButtonElement, ButtonProps>(
   ({ className, children, ...props }, ref) => {
+    const messages = useTiptapMessages()
+
     return (
       <Button
         type="button"
@@ -88,8 +91,8 @@ export const LinkButton = forwardRef<HTMLButtonElement, ButtonProps>(
         variant="ghost"
         role="button"
         tabIndex={-1}
-        aria-label="Link"
-        tooltip="Link"
+        aria-label={messages.link.label}
+        tooltip={messages.link.label}
         ref={ref}
         {...props}
       >
@@ -113,6 +116,7 @@ const LinkMain: React.FC<LinkMainProps> = ({
   isActive,
 }) => {
   const isMobile = useIsBreakpoint()
+  const messages = useTiptapMessages()
 
   const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
     if (event.key === "Enter") {
@@ -135,7 +139,7 @@ const LinkMain: React.FC<LinkMainProps> = ({
         <CardItemGroup orientation="horizontal">
           <Input
             type="url"
-            placeholder="Paste a link..."
+            placeholder={messages.link.inputPlaceholder}
             value={url}
             onChange={(e) => setUrl(e.target.value)}
             onKeyDown={handleKeyDown}
@@ -150,7 +154,7 @@ const LinkMain: React.FC<LinkMainProps> = ({
             <Button
               type="button"
               onClick={setLink}
-              title="Apply link"
+              title={messages.link.apply}
               disabled={!url && !isActive}
               variant="ghost"
             >
@@ -165,7 +169,7 @@ const LinkMain: React.FC<LinkMainProps> = ({
               <Button
                 type="button"
                 onClick={openLink}
-                title="Open in new window"
+                title={messages.link.open}
                 disabled={!url && !isActive}
                 variant="ghost"
               >
@@ -177,7 +181,7 @@ const LinkMain: React.FC<LinkMainProps> = ({
               <Button
                 type="button"
                 onClick={removeLink}
-                title="Remove link"
+                title={messages.link.remove}
                 disabled={!url && !isActive}
                 variant="ghost"
               >

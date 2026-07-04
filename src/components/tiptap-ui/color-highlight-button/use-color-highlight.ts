@@ -7,6 +7,10 @@ import { useHotkeys } from "react-hotkeys-hook"
 // --- Hooks ---
 import { useTiptapEditor } from "@/hooks/use-tiptap-editor"
 import { useIsBreakpoint } from "@/hooks/use-is-breakpoint"
+import {
+  type TiptapMessages,
+  useTiptapMessages,
+} from "@/components/tiptap-web-component/tiptap-messages"
 
 // --- Lib ---
 import {
@@ -65,6 +69,18 @@ export const HIGHLIGHT_COLORS = [
 ]
 export type HighlightColor = (typeof HIGHLIGHT_COLORS)[number]
 
+export function getHighlightColors(messages: TiptapMessages): HighlightColor[] {
+  return [
+    { ...HIGHLIGHT_COLORS[0], label: messages.colors.greenBackground },
+    { ...HIGHLIGHT_COLORS[1], label: messages.colors.redBackground },
+    { ...HIGHLIGHT_COLORS[2], label: messages.colors.orangeBackground },
+    { ...HIGHLIGHT_COLORS[3], label: messages.colors.blueBackground },
+    { ...HIGHLIGHT_COLORS[4], label: messages.colors.cyanBackground },
+    { ...HIGHLIGHT_COLORS[5], label: messages.colors.skyBackground },
+    { ...HIGHLIGHT_COLORS[6], label: messages.colors.purpleBackground },
+  ]
+}
+
 export type HighlightMode = "mark" | "node"
 
 /**
@@ -114,9 +130,13 @@ export interface UseColorHighlightConfig {
   }) => void
 }
 
-export function pickHighlightColorsByValue(values: string[]) {
+export function pickHighlightColorsByValue(
+  values: string[],
+  messages?: TiptapMessages
+) {
+  const colors = messages ? getHighlightColors(messages) : HIGHLIGHT_COLORS
   const colorMap = new Map(
-    HIGHLIGHT_COLORS.map((color) => [color.value, color])
+    colors.map((color) => [color.value, color])
   )
   return values
     .map((value) => colorMap.get(value))
@@ -262,6 +282,7 @@ export function useColorHighlight(config: UseColorHighlightConfig) {
   } = config
 
   const { editor } = useTiptapEditor(providedEditor)
+  const messages = useTiptapMessages()
   const isMobile = useIsBreakpoint()
   const [isVisible, setIsVisible] = useState<boolean>(true)
   const canColorHighlightState = canColorHighlight(editor, mode)
@@ -330,10 +351,10 @@ export function useColorHighlight(config: UseColorHighlightConfig) {
   const handleRemoveHighlight = useCallback(() => {
     const success = removeHighlight(editor, mode)
     if (success) {
-      onApplied?.({ color: "", label: "Remove highlight", mode })
+      onApplied?.({ color: "", label: messages.colors.removeHighlight, mode })
     }
     return success
-  }, [editor, onApplied, mode])
+  }, [editor, messages.colors.removeHighlight, onApplied, mode])
 
   useHotkeys(
     COLOR_HIGHLIGHT_SHORTCUT_KEY,
@@ -354,7 +375,7 @@ export function useColorHighlight(config: UseColorHighlightConfig) {
     handleColorHighlight,
     handleRemoveHighlight,
     canColorHighlight: canColorHighlightState,
-    label: label || `Highlight`,
+    label: label || messages.colors.highlight,
     shortcutKeys: COLOR_HIGHLIGHT_SHORTCUT_KEY,
     Icon: HighlighterIcon,
     mode,

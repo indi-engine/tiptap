@@ -3,6 +3,7 @@ import type { Editor } from "@tiptap/react"
 
 // --- Hooks ---
 import { useTiptapEditor } from "@/hooks/use-tiptap-editor"
+import { useTiptapMessages } from "@/components/tiptap-web-component/tiptap-messages"
 
 // --- Lib ---
 import { isMarkInSchema, isNodeTypeSelected } from "@/lib/tiptap-utils"
@@ -177,6 +178,7 @@ export function useMark(config: UseMarkConfig) {
   } = config
 
   const { editor } = useTiptapEditor(providedEditor)
+  const messages = useTiptapMessages()
   const [isVisible, setIsVisible] = useState<boolean>(true)
   const canToggle = canToggleMark(editor, type)
   const isActive = isMarkActive(editor, type)
@@ -212,7 +214,7 @@ export function useMark(config: UseMarkConfig) {
     isActive,
     handleMark,
     canToggle,
-    label: getFormattedMarkName(type),
+    label: messages.marks[type],
     shortcutKeys: MARK_SHORTCUT_KEYS[type],
     Icon: markIcons[type],
   }

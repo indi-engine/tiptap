@@ -1,5 +1,5 @@
 // src/components/tiptap-web-component/tiptap-wc-adapter.tsx
-import { useEffect, useLayoutEffect, useRef, useState } from "react"
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react"
 import { SimpleEditor } from "@/components/tiptap-templates/simple/simple-editor"
 import {
     TOOLBAR_PRESETS,
@@ -8,12 +8,18 @@ import {
     type ToolbarItemId,
 } from "@/components/tiptap-templates/simple/simple-editor-toolbar"
 import { ShadowPortalContext } from "@/components/tiptap-web-component/shadow-portal-context"
+import {
+    TIPTAP_L10N_CHANGE_EVENT,
+    TiptapMessagesContext,
+    resolveTiptapMessages,
+} from "@/components/tiptap-web-component/tiptap-messages"
 
 interface TiptapWCProps {
     value?: string
     toolbar?: string
     toolbarItems?: string
     placeholder?: string
+    locale?: string
     disabled?: boolean
 }
 
@@ -71,7 +77,13 @@ export function TiptapWCAdapter({ value }: TiptapWCProps) {
     const [isReadOnly, setIsReadOnly] = useState(false)
     const [isDisabled, setIsDisabled] = useState(false)
     const [placeholder, setPlaceholder] = useState<string | undefined>()
+    const [locale, setLocale] = useState("en")
+    const [messagesVersion, setMessagesVersion] = useState(0)
     const [toolbarConfig, setToolbarConfig] = useState<ToolbarConfig>(TOOLBAR_PRESETS.full)
+    const messages = useMemo(
+        () => resolveTiptapMessages(locale),
+        [locale, messagesVersion]
+    )
 
     // r2wc does not re-render when a string attribute is removed (value becomes null).
     // Watch the host element directly so add/removeAttribute calls work.
@@ -83,6 +95,7 @@ export function TiptapWCAdapter({ value }: TiptapWCProps) {
             setIsReadOnly(host.hasAttribute("readonly"))
             setIsDisabled(host.hasAttribute("disabled"))
             setPlaceholder(host.getAttribute("placeholder") ?? undefined)
+            setLocale(host.getAttribute("locale") ?? "en")
             setToolbarConfig(resolveToolbar(host))
         }
         syncHostAttributes()
@@ -90,9 +103,20 @@ export function TiptapWCAdapter({ value }: TiptapWCProps) {
         const observer = new MutationObserver(syncHostAttributes)
         observer.observe(host, {
             attributes: true,
-            attributeFilter: ["readonly", "disabled", "placeholder", "toolbar", "toolbar-items"],
+            attributeFilter: ["readonly", "disabled", "placeholder", "locale", "toolbar", "toolbar-items"],
         })
         return () => observer.disconnect()
+    }, [])
+
+    useEffect(() => {
+        const handleMessagesChange = () => {
+            setMessagesVersion((version) => version + 1)
+        }
+
+        window.addEventListener(TIPTAP_L10N_CHANGE_EVENT, handleMessagesChange)
+        return () => {
+            window.removeEventListener(TIPTAP_L10N_CHANGE_EVENT, handleMessagesChange)
+        }
     }, [])
 
     useEffect(() => {
@@ -127,16 +151,18 @@ export function TiptapWCAdapter({ value }: TiptapWCProps) {
     return (
         <div ref={hostRef}>
             <style>{TIPTAP_ELEMENT_CSS}</style>
-            <ShadowPortalContext.Provider value={portalContainer}>
-                <SimpleEditor
-                    content={value}
-                    onContentChange={handleContentChange}
-                    isReadOnly={isReadOnly}
-                    isDisabled={isDisabled}
-                    placeholder={placeholder}
-                    toolbar={toolbarConfig}
-                />
-            </ShadowPortalContext.Provider>
+            <TiptapMessagesContext.Provider value={messages}>
+                <ShadowPortalContext.Provider value={portalContainer}>
+                    <SimpleEditor
+                        content={value}
+                        onContentChange={handleContentChange}
+                        isReadOnly={isReadOnly}
+                        isDisabled={isDisabled}
+                        placeholder={placeholder}
+                        toolbar={toolbarConfig}
+                    />
+                </ShadowPortalContext.Provider>
+            </TiptapMessagesContext.Provider>
         </div>
     )
 }

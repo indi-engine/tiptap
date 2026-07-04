@@ -3,6 +3,7 @@ import { type Editor } from "@tiptap/react"
 
 // --- Hooks ---
 import { useTiptapEditor } from "@/hooks/use-tiptap-editor"
+import { useTiptapMessages } from "@/components/tiptap-web-component/tiptap-messages"
 
 // --- Icons ---
 import { ChevronDownIcon } from "@/components/tiptap-icons/chevron-down-icon"
@@ -62,6 +63,7 @@ function TextAlignDropdownMenuImpl(
   ref: ForwardedRef<HTMLButtonElement>
 ) {
   const { editor } = useTiptapEditor(providedEditor)
+  const messages = useTiptapMessages()
   const [isOpen, setIsOpen] = useState(false)
 
   const { filteredAlignments, canToggle, isActive, isVisible, Icon } =
@@ -94,8 +96,8 @@ function TextAlignDropdownMenuImpl(
           tabIndex={-1}
           disabled={!canToggle}
           data-disabled={!canToggle}
-          aria-label="Text alignment options"
-          tooltip="Text align"
+          aria-label={messages.alignment.options}
+          tooltip={messages.alignment.label}
           {...props}
           ref={ref}
         >

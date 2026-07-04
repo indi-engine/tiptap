@@ -3,6 +3,7 @@ import { type Editor } from "@tiptap/react"
 
 // --- Hooks ---
 import { useTiptapEditor } from "@/hooks/use-tiptap-editor"
+import { useTiptapMessages } from "@/components/tiptap-web-component/tiptap-messages"
 
 // --- Lib ---
 import { isNodeTypeSelected } from "@/lib/tiptap-utils"
@@ -148,6 +149,7 @@ export function useUndoRedo(config: UseUndoRedoConfig) {
   } = config
 
   const { editor } = useTiptapEditor(providedEditor)
+  const messages = useTiptapMessages()
   const [isVisible, setIsVisible] = useState<boolean>(true)
   const canExecute = canExecuteUndoRedoAction(editor, action)
 
@@ -181,7 +183,7 @@ export function useUndoRedo(config: UseUndoRedoConfig) {
     isVisible,
     handleAction,
     canExecute,
-    label: historyActionLabels[action],
+    label: action === "undo" ? messages.history.undo : messages.history.redo,
     shortcutKeys: UNDO_REDO_SHORTCUT_KEYS[action],
     Icon: historyIcons[action],
   }

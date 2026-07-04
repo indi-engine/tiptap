@@ -5,6 +5,10 @@ import type { Editor } from "@tiptap/react"
 
 // --- Hooks ---
 import { useTiptapEditor } from "@/hooks/use-tiptap-editor"
+import {
+  type TiptapMessages,
+  useTiptapMessages,
+} from "@/components/tiptap-web-component/tiptap-messages"
 
 // --- Icons ---
 import { ListIcon } from "@/components/tiptap-icons/list-icon"
@@ -48,23 +52,25 @@ export interface ListOption {
   icon: React.ElementType
 }
 
-export const listOptions: ListOption[] = [
-  {
-    label: "Bullet List",
-    type: "bulletList",
-    icon: ListIcon,
-  },
-  {
-    label: "Ordered List",
-    type: "orderedList",
-    icon: ListOrderedIcon,
-  },
-  {
-    label: "Task List",
-    type: "taskList",
-    icon: ListTodoIcon,
-  },
-]
+export function getListOptions(messages: TiptapMessages): ListOption[] {
+  return [
+    {
+      label: messages.blocks.bulletList,
+      type: "bulletList",
+      icon: ListIcon,
+    },
+    {
+      label: messages.blocks.orderedList,
+      type: "orderedList",
+      icon: ListOrderedIcon,
+    },
+    {
+      label: messages.blocks.taskList,
+      type: "taskList",
+      icon: ListTodoIcon,
+    },
+  ]
+}
 
 export function canToggleAnyList(
   editor: Editor | null,
@@ -83,9 +89,10 @@ export function isAnyListActive(
 }
 
 export function getFilteredListOptions(
-  availableTypes: ListType[]
-): typeof listOptions {
-  return listOptions.filter(
+  availableTypes: ListType[],
+  messages: TiptapMessages
+) {
+  return getListOptions(messages).filter(
     (option) => !option.type || availableTypes.includes(option.type)
   )
 }
@@ -172,11 +179,15 @@ export function useListDropdownMenu(config?: UseListDropdownMenuConfig) {
   } = config || {}
 
   const { editor } = useTiptapEditor(providedEditor)
+  const messages = useTiptapMessages()
   const [isVisible, setIsVisible] = useState(true)
 
   const listInSchema = types.some((type) => isNodeInSchema(type, editor))
 
-  const filteredLists = useMemo(() => getFilteredListOptions(types), [types])
+  const filteredLists = useMemo(
+    () => getFilteredListOptions(types, messages),
+    [messages, types]
+  )
 
   const canToggleAny = canToggleAnyList(editor, types)
   const isAnyActive = isAnyListActive(editor, types)
@@ -214,7 +225,7 @@ export function useListDropdownMenu(config?: UseListDropdownMenuConfig) {
     canToggle: canToggleAny,
     types,
     filteredLists,
-    label: "List",
+    label: messages.blocks.list,
     Icon: activeList ? listIcons[activeList.type] : ListIcon,
   }
 }
