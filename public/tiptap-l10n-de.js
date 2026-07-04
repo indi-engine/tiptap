@@ -1,6 +1,3 @@
-window.TiptapEditor = window.TiptapEditor || {}
-window.TiptapEditor.l10n = window.TiptapEditor.l10n || {}
-
 window.TiptapEditor.l10n.de = {
   editor: {
     ariaLabel: 'Hauptinhaltsbereich, beginnen Sie mit der Eingabe.'
