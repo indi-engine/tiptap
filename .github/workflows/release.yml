@@ -38,13 +38,10 @@ jobs:
       - name: Prepare release package
         run: |
           cd dist
-          zip -r ../tiptap-element.zip .
+          zip -r ../tiptap.zip .
 
       - name: Create GitHub release
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ steps.version.outputs.new_tag }}
-          files: |
-            tiptap-element.zip
-            dist/tiptap-element.js
-            dist/tiptap-l10n-*.js
+          files: tiptap.zip
