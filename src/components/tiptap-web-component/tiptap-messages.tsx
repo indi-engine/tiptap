@@ -102,19 +102,14 @@ type DeepPartial<T> = {
 }
 
 type MessageRegistry = Record<string, TiptapMessagesOverride>
+type ObservableMessageRegistry = MessageRegistry & {
+  __tiptapL10nObservable?: true
+}
 
 declare global {
   interface Window {
-    TIPTAP_L10N?: MessageRegistry
     TiptapEditor?: {
-      registerL10n?: (
-        locale: string,
-        messages: TiptapMessagesOverride
-      ) => void
-      registerMessages?: (
-        locale: string,
-        messages: TiptapMessagesOverride
-      ) => void
+      l10n?: MessageRegistry
     } & Record<string, unknown>
   }
 }
@@ -153,41 +148,54 @@ export function resolveTiptapMessages(locale: string) {
 export function installTiptapMessageRegistry() {
   if (typeof window === "undefined") return
 
-  window.TIPTAP_L10N = window.TIPTAP_L10N ?? {}
   window.TiptapEditor = window.TiptapEditor ?? {}
-
-  const previousRegisterL10n = window.TiptapEditor.registerL10n
-  const previousRegisterMessages = window.TiptapEditor.registerMessages
-
-  window.TiptapEditor.registerL10n = (locale, messages) => {
-    const normalizedLocale = normalizeLocale(locale)
-    const currentMessages = window.TIPTAP_L10N?.[normalizedLocale]
-
-    window.TIPTAP_L10N = {
-      ...(window.TIPTAP_L10N ?? {}),
-      [normalizedLocale]: mergeMessages(currentMessages ?? {}, messages),
-    }
-
-    previousRegisterL10n?.(normalizedLocale, messages)
-    previousRegisterMessages?.(normalizedLocale, messages)
-
-    window.dispatchEvent(
-      new CustomEvent(TIPTAP_L10N_CHANGE_EVENT, {
-        detail: { locale: normalizedLocale },
-      })
-    )
-  }
-
-  window.TiptapEditor.registerMessages = window.TiptapEditor.registerL10n
+  window.TiptapEditor.l10n = createObservableMessageRegistry(
+    window.TiptapEditor.l10n ?? {}
+  )
 }
 
 function getMessageRegistry() {
   if (typeof window === "undefined") return {}
-  return window.TIPTAP_L10N ?? {}
+  return window.TiptapEditor?.l10n ?? {}
 }
 
 function normalizeLocale(locale: string) {
   return (locale || "en").trim().toLowerCase() || "en"
+}
+
+function createObservableMessageRegistry(registry: MessageRegistry) {
+  const observableRegistry = registry as ObservableMessageRegistry
+  if (observableRegistry.__tiptapL10nObservable) return observableRegistry
+
+  const proxy = new Proxy(observableRegistry, {
+    set(target, property, value) {
+      target[property as string] = value
+      notifyMessageRegistryChange(String(property))
+      return true
+    },
+    deleteProperty(target, property) {
+      delete target[property as string]
+      notifyMessageRegistryChange(String(property))
+      return true
+    },
+  }) as ObservableMessageRegistry
+
+  Object.defineProperty(proxy, "__tiptapL10nObservable", {
+    value: true,
+    enumerable: false,
+  })
+
+  return proxy
+}
+
+function notifyMessageRegistryChange(locale: string) {
+  if (typeof window === "undefined") return
+
+  window.dispatchEvent(
+    new CustomEvent(TIPTAP_L10N_CHANGE_EVENT, {
+      detail: { locale: normalizeLocale(locale) },
+    })
+  )
 }
 
 function mergeMessages<T extends Record<string, unknown>>(
